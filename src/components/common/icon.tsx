@@ -6,6 +6,7 @@ import {
   Facebook,
   Instagram,
   Youtube,
+  Star
 } from "lucide-react";
 
 const icons = {
@@ -15,6 +16,7 @@ const icons = {
   facebook: Facebook,
   instagram: Instagram,
   youtube: Youtube,
+  star: Star
 };
 
 interface IconProps extends LucideProps {
