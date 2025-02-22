@@ -5,9 +5,9 @@ export default function Footer() {
     <footer className="bg-white border-t py-10">
       <div className="container mx-auto px-10">
         <div className="grid grid-cols-5 items-start gap-4">
-          <div className="items-start">
-            <h3 className="text-left font-bold mb-3">PRODUCTS</h3>
-            <div className="flex flex-col items-start">
+          <div>
+            <h3 className="text-center font-bold mb-3">PRODUCTS</h3>
+            <div className="flex flex-col gap-y-1">
                 <Button variant="link" className="text-xs" >Shoes</Button>
                 <Button variant="link" className="text-xs" >Clothing</Button>
                 <Button variant="link" className="text-xs" >Accessories</Button>
@@ -19,9 +19,9 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="items-start">
-            <h3 className="text-left font-bold mb-3">SPORTS</h3>
-            <div className="space-y-1">
+          <div>
+            <h3 className="text-center font-bold mb-3">SPORTS</h3>
+            <div className="flex flex-col gap-y-1">
               <Button variant="link" className="text-xs" >Soccer</Button>
               <Button variant="link" className="text-xs" >Running</Button>
               <Button variant="link" className="text-xs" >Basketball</Button>
@@ -30,28 +30,28 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="items-start">
-            <h3 className="text-left font-bold mb-3">SUPPORT</h3>
-            <div className="space-y-1">
+          <div>
+            <h3 className="text-center font-bold mb-3">SUPPORT</h3>
+            <div className="flex flex-col gap-y-1">
               <Button variant="link" className="text-xs" >Help</Button>
               <Button variant="link" className="text-xs" >Shipping</Button>
               <Button variant="link" className="text-xs" >Order Tracker</Button>
-              <Button variant="link" className="text-xs" >Store Locator</Button>
+              <Button variant="link" className="text-xs" >Order Tracker</Button>
             </div>
           </div>
 
-          <div className="items-start">
-            <h3 className="text-left font-bold mb-3">COMPANY</h3>
-            <div className="space-y-1">
+          <div>
+            <h3 className="text-center font-bold mb-3">COMPANY</h3>
+            <div className="flex flex-col gap-y-1">
               <Button variant="link" className="text-xs" >About Us</Button>
               <Button variant="link" className="text-xs" >Careers</Button>
               <Button variant="link" className="text-xs" >Planet</Button>
             </div>
           </div>
 
-          <div className="items-start">
-            <h3 className="text-left font-bold mb-3">FOLLOW US</h3>
-            <div className="flex flex-col items-start space-y-3">
+          <div>
+            <h3 className="text-center font-bold mb-3">FOLLOW US</h3>
+            <div className="flex flex-col gap-y-1">
                 <Icon name="facebook" className="w-5 h-5" />
                 <Icon name="instagram" className="w-5 h-5" />
                 <Icon name="youtube" className="w-5 h-5" />

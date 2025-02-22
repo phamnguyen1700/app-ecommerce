@@ -7,8 +7,8 @@ import Image from "next/image";
 
 export default function ProductCard({ product }: IProductCardProps) {
     return (
-        <Card className="w-full max-w-sm border border-gray-200 rounded-lg shadow-md overflow-hidden">
-      <div className="relative w-full h-48">
+        <Card className="w-full max-w-xs border border-gray-200 rounded-lg shadow-md overflow-hidden">
+      <div className="relative w-full h-32">
         <Image
           src={product.images[0] || "/placeholder.png"}
           alt={product.name}
@@ -16,8 +16,8 @@ export default function ProductCard({ product }: IProductCardProps) {
           objectFit="cover"
         />
       </div>
-      <CardHeader>
-        <CardTitle className="text-lg font-bold">{product.name}</CardTitle>
+      <CardHeader className="flex flex-col pt-2 pb-2">
+        <CardTitle className="text-lg font-semibold">{product.name}</CardTitle>
         <p className="text-sm text-gray-500">{product.brand}</p>
       </CardHeader>
       <CardContent>
