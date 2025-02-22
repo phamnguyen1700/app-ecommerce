@@ -18,12 +18,20 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/common/sideDrawer";
+import Icon from "@/components/common/icon";
 export default function Header() {
   const [openUser, setOpenUser] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [userNameValue, setUserNameValue] = useState("");
+  const [tempEmailValue, setTempEmailValue] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  console.log(userNameValue);
+
   return (
     <header className="w-full">
-      <div className="w-full h-7 py-1 font-semibold bg-black text-white text-center text-xs">
+      <div className="w-full h-7 pt-1.5 font-semibold bg-black text-white text-center text-xs">
         KHUYẾN MÃI THÊM Ở ĐÂY
       </div>
       <div className="h-3">
@@ -112,15 +120,57 @@ export default function Header() {
                   Get free shipping, discount vouchers and members only products
                   when you’re in adiClub.
                 </div>
-                <b className="text-xs">Log in or sign up - it&apos;s free</b>
-                <div className="flex-col">
-                  <GoogleButton />
-                  <Input
-                    type="email"
-                    placeholder="EMAIL ADDRESS *"
-                    className="mt-2"
-                  />
-                </div>
+
+                {userNameValue === "" ? (
+                  <div>
+                    <b className="text-xs">
+                      Log in or sign up - it&apos;s free
+                    </b>
+                    <div className="flex-col">
+                      <GoogleButton />
+                      <Input
+                        type="email"
+                        placeholder="EMAIL ADDRESS *"
+                        className="mt-2"
+                        value={tempEmailValue}
+                        onChange={(e) => setTempEmailValue(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="w-full justify-items-end ">
+                      {showPassword ? (
+                        <div className="flex justify-end">
+                          <Button
+                            className="font-semibold text-gray-600 hover:text-black "
+                            variant="link"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            <Icon name="eye" />
+                            Show
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex justify-end">
+                          <Button
+                            className="font-semibold text-gray-600 hover:text-black "
+                            variant="link"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            <Icon name="eye" />
+                            Hide
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    <Input
+                      type={showPassword ? "password" : "text"}
+                      placeholder="Password *"
+                    />
+                  </div>
+                )}
 
                 <div className="flex items-center">
                   <Checkbox />
@@ -128,7 +178,10 @@ export default function Header() {
                     Keep me logged in.
                   </label>
                 </div>
-                <Button className="w-1/3 py-3 font-bold text-white bg-black hover:text-gray-300">
+                <Button
+                  className="w-1/3 py-3 font-bold text-white bg-black hover:text-gray-300"
+                  onClick={() => setUserNameValue(tempEmailValue)} 
+                >
                   CONTINUE →
                 </Button>
                 <div className="font-light text-gray-400 text-xs">
