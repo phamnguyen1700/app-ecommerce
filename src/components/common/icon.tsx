@@ -7,7 +7,9 @@ import {
   Instagram,
   Youtube,
   Star,
-  Eye
+  Eye,
+  Menu,
+  Bell
 } from "lucide-react";
 
 const icons = {
@@ -18,7 +20,9 @@ const icons = {
   instagram: Instagram,
   youtube: Youtube,
   star: Star,
-  eye: Eye
+  eye: Eye,
+  menu: Menu,
+  bell: Bell
 };
 
 interface IconProps extends LucideProps {
