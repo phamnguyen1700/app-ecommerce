@@ -22,7 +22,7 @@ import Icon from "@/components/common/icon";
 import { useDispatch } from "react-redux";
 import { loginThunk } from "@/redux/thunks/Auth";
 import { AppDispatch } from "@/redux/store";
-import { ToastProvider } from "@/components/layout/toastProvider";
+import Navbar from "@/components/layout/nav/commercialNav";
 
 export default function Header() {
   const loggedIn = localStorage.getItem("accessToken");
@@ -59,7 +59,6 @@ export default function Header() {
   };
 
   return (
-    <ToastProvider>
       <header className="w-full">
         <div className="w-full h-7 pt-1.5 font-semibold bg-black text-white text-center text-xs">
           KHUYẾN MÃI THÊM Ở ĐÂY
@@ -79,23 +78,7 @@ export default function Header() {
         </div>
         <div className="grid grid-cols-3 items-center pt-3 px-8 border-b">
           <div className="flex justify-start">LOGO</div>
-          <div className="flex justify-center">
-            <Button className="font-bold" variant="link">
-              Trang chủ
-            </Button>
-            <Button className="font-bold" variant="link">
-              Sản phẩm
-            </Button>
-            <Button className="font-bold" variant="link">
-              Blogs
-            </Button>
-            <Button className="font-bold" variant="link">
-              Tin tức
-            </Button>
-            <Button className="font-bold" variant="link">
-              Q/A
-            </Button>
-          </div>
+            <Navbar/>
           <div className="flex justify-end gap-5">
             <SearchInput />
 
@@ -247,6 +230,5 @@ export default function Header() {
           </div>
         </div>
       </header>
-    </ToastProvider>
   );
 }

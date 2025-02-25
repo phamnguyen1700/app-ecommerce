@@ -1,6 +1,7 @@
-import { API } from "@/utils/Api"; // Thay đổi cách import
+import { API } from "@/utils/Api"; 
 
 export const getProductService = async () => {
     const res = await API.get("/products");
+    console.log(res.data); 
     return res.data;
 };
