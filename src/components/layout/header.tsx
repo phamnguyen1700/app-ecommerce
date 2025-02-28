@@ -20,7 +20,7 @@ import {
 } from "@/components/common/sideDrawer";
 import Icon from "@/components/common/icon";
 import { useDispatch } from "react-redux";
-import { loginThunk, refreshTokenThunk } from "@/redux/thunks/Auth";
+import { loginThunk } from "@/redux/thunks/Auth";
 import { AppDispatch } from "@/redux/store";
 import Navbar from "@/components/layout/nav/commercialNav";
 import Image from "next/image";

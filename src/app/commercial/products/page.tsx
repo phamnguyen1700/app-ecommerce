@@ -24,7 +24,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     getProductAPI();
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className="container mx-auto p-4">
