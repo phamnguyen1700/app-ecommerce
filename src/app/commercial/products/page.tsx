@@ -4,7 +4,7 @@ import "@/app/globals.css";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import ProductCard from "@/components/common/productCard";
-import { getProductThunk } from "@/redux/thunks/Product";
+import { getAllProductThunk } from "@/redux/thunks/Product";
 import { AppDispatch } from "@/redux/store";
 import { IProduct } from "@/typings/product";
 
@@ -14,7 +14,7 @@ export default function ProductsPage() {
 
   const getProductAPI = async () => {
     try {
-      const res = await dispatch(getProductThunk()).unwrap();
+      const res = await dispatch(getAllProductThunk()).unwrap();
       setProducts(res);
       console.log(res);
     } catch (err) {
