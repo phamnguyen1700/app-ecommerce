@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <div className="flex justify-center space-x-6">
+    <div className="grid grid-cols-5 gap-4 place-items-center">
       <Button className="font-bold" variant="link">
         <Link href="/commercial/home" passHref>
           Trang chủ

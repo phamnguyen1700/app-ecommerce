@@ -10,14 +10,14 @@ export default function ProductCard({ product }: IProductCardProps) {
         <Card className="w-full max-w-xs border border-gray-200 rounded-lg shadow-md overflow-hidden">
       <div className="relative w-full h-32">
         <Image
-          src={product.images[0] || "/placeholder.png"}
+          src={product.images[0]}
           alt={product.name}
           layout="fill"
           objectFit="cover"
         />
       </div>
       <CardHeader className="flex flex-col pt-2 pb-2">
-        <CardTitle className="text-lg font-semibold">{product.name}</CardTitle>
+        <CardTitle className="text-lg font-semibold line-clamp-2">{product.name}</CardTitle>
         <p className="text-sm text-gray-500">{product.brand}</p>
       </CardHeader>
       <CardContent>

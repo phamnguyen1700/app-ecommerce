@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import GoogleButton from "../common/googleButton";
@@ -20,35 +20,74 @@ import {
 } from "@/components/common/sideDrawer";
 import Icon from "@/components/common/icon";
 import { useDispatch } from "react-redux";
-import { loginThunk } from "@/redux/thunks/Auth";
+import { loginThunk, refreshTokenThunk } from "@/redux/thunks/Auth";
 import { AppDispatch } from "@/redux/store";
 import Navbar from "@/components/layout/nav/commercialNav";
 import Image from "next/image";
+import DefaultImage from "@/assets/pictures/avatar.jpg";
+import { useForm } from "react-hook-form";
 
 export default function Header() {
-  const loggedIn = typeof window !== "undefined" ? localStorage.getItem("userToken") : null;
+  const [loggedIn, setLoggedIn] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const [openUser, setOpenUser] = useState(false);
-  const [userNameValue, setUserNameValue] = useState("");
-  const [emailValue, setEmailValue] = useState("");
-  const [passValue, setPassValue] = useState("");
+  const [signUp, setSignUp] = useState(false);
+  const { register, setValue, watch, reset } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      loginEmail: "",
+      loginPassword: "",
+    },
+  });
   const [step, setStep] = useState<"email" | "password">("email");
-
   const [showPassword, setShowPassword] = useState(false);
 
-  console.log(emailValue);
-  console.log(passValue);
+  console.log(watch("loginEmail"));
+  console.log(watch("password"));
+  console.log(loggedIn);
+
+  useEffect(() => {
+    if (loggedIn === null) {
+      const token = localStorage.getItem("accessToken");
+      setLoggedIn(token);
+    }
+    if (openUser) {
+      reset();
+    }
+  }, [loggedIn, openUser, dispatch, reset]);
+
+  // useEffect(() => {
+  //   if (loggedIn !== null) {
+  //     const interval = setInterval(() => {
+  //       dispatch(refreshTokenThunk());
+  //     }, 10 * 1000);
+
+  //     return () => clearInterval(interval);
+  //   }
+  // }, [loggedIn, dispatch]);
+
+  const handleSignUp = () => {
+    setSignUp(!signUp);
+    reset();
+  };
 
   const handleContinue = () => {
     if (step === "email") {
-      setUserNameValue(emailValue);
+      setValue("loginEmail", watch("email"));
       setStep("password");
     } else if (step === "password") {
       console.log("Logging in with:", {
-        email: emailValue,
-        password: passValue,
+        email: watch("loginEmail"),
+        password: watch("loginPassword"),
       });
-      dispatch(loginThunk({ email: emailValue, password: passValue }));
+      dispatch(
+        loginThunk({
+          email: watch("loginEmail"),
+          password: watch("loginPassword"),
+        })
+      );
       setOpenUser(false);
     }
   };
@@ -92,10 +131,10 @@ export default function Header() {
                 <DrawerTitle className="text-center text-lg font-semibold pt-2 pb-6 bg-gray-200 border border-b-gray-300">
                   HI NGUYỄN
                   <Image
-                    src="https://tse1.mm.bing.net/th?id=OIP.lfFFYzOkuCbucHfsStxd4QHaJQ&pid=Api&P=0&h=220"
+                    src={DefaultImage}
                     alt="User Avatar"
-                    width={160} 
-                    height={160} 
+                    width={160}
+                    height={160}
                     className="justify-self-center p-2 rounded-full"
                   />
                 </DrawerTitle>
@@ -151,21 +190,75 @@ export default function Header() {
                   when you’re in adiClub.
                 </div>
 
-                {userNameValue === "" ? (
+                {watch("loginEmail") === "" ? (
                   <div>
                     <b className="text-xs">
-                      Log in or sign up - it&apos;s free
+                      Log in or{" "}
+                      <span
+                        onClick={handleSignUp}
+                        className="hover:font-bold hover:underline cursor-pointer transition-all duration-200"
+                      >
+                        sign up
+                      </span>{" "}
+                      - it&apos;s free
                     </b>
-                    <div className="flex-col">
-                      <GoogleButton />
-                      <Input
-                        type="email"
-                        placeholder="EMAIL ADDRESS *"
-                        className="mt-2"
-                        value={emailValue}
-                        onChange={(e) => setEmailValue(e.target.value)}
-                      />
-                    </div>
+
+                    {signUp === true ? (
+                      <div className="flex-col">
+                        <Input
+                          type="text"
+                          placeholder="NAME *"
+                          className="mt-2"
+                          {...register("name", { required: true })}
+                        />
+                        <Input
+                          type="email"
+                          placeholder="EMAIL ADDRESS *"
+                          className="mt-2"
+                          {...register("email", { required: true })}
+                        />
+                        <div className="w-full justify-items-end ">
+                          {showPassword ? (
+                            <div className="flex justify-end">
+                              <Button
+                                className="font-semibold text-gray-600 hover:text-black "
+                                variant="link"
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
+                                <Icon name="eye" />
+                                Show
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex justify-end">
+                              <Button
+                                className="font-semibold text-gray-600 hover:text-black "
+                                variant="link"
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
+                                <Icon name="eye" />
+                                Hide
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                        <Input
+                          type={showPassword ? "password" : "text"}
+                          placeholder="Password *"
+                          {...register("password", { required: true })}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex-col">
+                        <GoogleButton />
+                        <Input
+                          type="email"
+                          placeholder="EMAIL ADDRESS *"
+                          className="mt-2"
+                          {...register("email", { required: true })}
+                        />
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div>
@@ -198,8 +291,7 @@ export default function Header() {
                     <Input
                       type={showPassword ? "password" : "text"}
                       placeholder="Password *"
-                      value={passValue}
-                      onChange={(e) => setPassValue(e.target.value)}
+                      {...register("loginPassword", { required: true })}
                     />
                   </div>
                 )}

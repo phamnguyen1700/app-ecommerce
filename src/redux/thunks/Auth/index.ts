@@ -1,8 +1,6 @@
-import { loginService } from "@/redux/services/Auth";
+import { loginService, refreshTokenService } from "@/redux/services/Auth";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-
-
 
 export const loginThunk = createAsyncThunk(
     "auth/login",
@@ -19,3 +17,25 @@ export const loginThunk = createAsyncThunk(
       }
     }
   );
+
+  export const refreshTokenThunk = createAsyncThunk(
+    "auth/refreshToken",
+    async (_, { rejectWithValue }) => {
+      try {
+        const res = await refreshTokenService();
+        const newAccessToken = res.accessToken;
+        localStorage.setItem("accessToken", newAccessToken);
+        console.log("Token refreshed!");
+        return newAccessToken;
+      } catch (error) {
+        toast.error("Lỗi khi làm mới token, vui lòng đăng nhập lại!");
+      return rejectWithValue(error);
+      }
+    }
+  );
+
+  export const logoutThunk = createAsyncThunk("auth/logout", async () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
+  }
+  )

@@ -8,3 +8,12 @@ export const loginService = async (email: string, password: string) => {
     return console.log(error);
   }
 };
+
+export const refreshTokenService = async () => {
+  try {
+    const res = await API.post("/auth/refresh");
+    return res.data;
+  } catch (error) {
+    return console.log(error);
+  }
+}
