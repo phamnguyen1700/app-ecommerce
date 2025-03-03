@@ -21,7 +21,7 @@ import {
 } from "@/components/common/sideDrawer";
 import Icon from "@/components/common/icon";
 import { useDispatch } from "react-redux";
-import { loginThunk } from "@/redux/thunks/Auth";
+import { loginThunk, refreshTokenThunk } from "@/redux/thunks/Auth";
 import { AppDispatch } from "@/redux/store";
 import Navbar from "@/components/layout/nav/commercialNav";
 import Image from "next/image";
@@ -60,15 +60,15 @@ export default function Header() {
     }
   }, [loggedIn, openUser, dispatch, reset]);
 
-  // useEffect(() => {
-  //   if (loggedIn !== null) {
-  //     const interval = setInterval(() => {
-  //       dispatch(refreshTokenThunk());
-  //     }, 10 * 1000);
+  useEffect(() => {
+    if (loggedIn !== null) {
+      const interval = setInterval(() => {
+        dispatch(refreshTokenThunk());
+      }, 10 * 1000);
 
-  //     return () => clearInterval(interval);
-  //   }
-  // }, [loggedIn, dispatch]);
+      return () => clearInterval(interval);
+    }
+  }, [loggedIn, dispatch]);
 
   const handleSignUp = () => {
     setSignUp(!signUp);

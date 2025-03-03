@@ -9,6 +9,6 @@ export interface IOrderItem {
 export interface IOrder {
     items: IOrderItem[];
     totalAmount: number;
-    paymentMethod: "Stripe" | "PayPal" | "COD"; 
+    paymentMethod: "Stripe"; 
     shippingAddress: Omit<IAddress, "_id">; 
   }

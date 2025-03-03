@@ -8,7 +8,7 @@ export default function ProductCard({ product }: IProductCardProps) {
   const productImage =
     product.images?.[0] && product.images[0].trim() !== ""
       ? product.images[0]
-      : "/assets/image.pnj";
+      : "/assets/pictures/image.png";
 
   return (
     <Card className="w-full max-w-xs border border-gray-200 rounded-lg shadow-md overflow-hidden hover:border-black hover:border-2">
@@ -16,9 +16,9 @@ export default function ProductCard({ product }: IProductCardProps) {
         <Image
           src={productImage}
           alt={product.name}
-          layout="fill"
-          objectFit="cover"
-          className="rounded-t-lg"
+          fill
+          className="rounded-t-lg object-cover"
+          sizes="100%"
         />
 
         <button className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:bg-gray-200 transition">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CART_STORAGE_KEY } from "@/constants/storageKey";
+import { CART_STORAGE_KEY, USER_STORAGE_KEY } from "@/constants/storageKey";
 import { Button } from "@/components/ui/button";
 import {
   Drawer as SideDrawer,
@@ -10,6 +10,12 @@ import {
 } from "@/components/common/sideDrawer";
 import Icon from "@/components/common/icon";
 import Image from "next/image";
+import { DrawerTitle } from "../ui/drawer";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
+import { IOrder } from "@/typings/order/order";
+import { createOrderThunk } from "@/redux/thunks/Order";
+import { toast } from "react-toastify";
 
 interface CartItem {
   product: string;
@@ -21,9 +27,12 @@ interface CartItem {
 
 export default function ViewCartButton() {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
 
   const updateCart = () => {
-    const storedCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
+    const storedCart = JSON.parse(
+      localStorage.getItem(CART_STORAGE_KEY) || "[]"
+    );
     setCart(storedCart);
   };
 
@@ -41,8 +50,7 @@ export default function ViewCartButton() {
     const updatedCart = cart.filter((item) => item.product !== productId);
     setCart(updatedCart);
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updatedCart));
-        window.dispatchEvent(new Event("cartUpdated"));
-
+    window.dispatchEvent(new Event("cartUpdated"));
   };
 
   const handleQuantityChange = (productId: string, change: number) => {
@@ -59,7 +67,46 @@ export default function ViewCartButton() {
     setCart(updatedCart);
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updatedCart));
     window.dispatchEvent(new Event("cartUpdated"));
+  };
 
+  const handlePlaceOrder = async () => {
+    const storedUser = JSON.parse(
+      localStorage.getItem(USER_STORAGE_KEY) || "null"
+    );
+
+    if (!storedUser || cart.length === 0) {
+      alert("Vui lòng đăng nhập để tiếp tục!");
+      return;
+    }
+
+    const orderData: IOrder = {
+      items: cart.map((item) => ({
+        product: item.product,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      totalAmount: cart.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
+      paymentMethod: "Stripe",
+      shippingAddress: {
+        fullnames: storedUser.address.fullName,
+        street: storedUser.address.street,
+        city: storedUser.address.city,
+        province: storedUser.address.province,
+        phone: storedUser.address.phone,
+      },
+    };
+    try {
+      await dispatch(createOrderThunk(orderData)).unwrap();
+      toast.success("Đơn hàng đã được tạo thành công!");
+      localStorage.removeItem(CART_STORAGE_KEY);
+      window.dispatchEvent(new Event("cartUpdated"));
+    } catch (error) {
+        toast.error("Lỗi khi tạo đơn hàng, vui lòng thử lại!");
+      console.error(error);
+    }
   };
 
   return (
@@ -75,10 +122,10 @@ export default function ViewCartButton() {
         </div>
       </DrawerTrigger>
       <DrawerContent className="w-72 p-4">
-        <h3 className="text-lg text-center">Your Cart</h3>
+        <DrawerTitle className="text-lg text-center">Giỏ Hàng</DrawerTitle>
         {cart.length === 0 ? (
           <div className="text-center py-6 text-lg font-semibold">
-            YOUR CART IS EMPTY
+            CHƯA CÓ SẢN PHẨM NÀO!
           </div>
         ) : (
           <div className="space-y-4 mt-4">
@@ -130,8 +177,11 @@ export default function ViewCartButton() {
                 </div>
               </div>
             ))}
-            <Button className="w-full bg-black text-white hover:bg-gray-800">
-              Checkout
+            <Button
+              className="w-full bg-black text-white hover:bg-gray-800"
+              onClick={handlePlaceOrder}
+            >
+              Đặt hàng
             </Button>
           </div>
         )}

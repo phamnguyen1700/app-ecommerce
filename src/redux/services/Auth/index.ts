@@ -11,7 +11,7 @@ export const loginService = async (email: string, password: string) => {
 
 export const refreshTokenService = async () => {
   try {
-    const res = await API.post("/auth/refresh");
+    const res = await API.post("/auth/refresh", {}, { withCredentials: true });
     return res.data;
   } catch (error) {
     return console.log(error);
