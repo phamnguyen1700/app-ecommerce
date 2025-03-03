@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
@@ -26,6 +27,7 @@ import Navbar from "@/components/layout/nav/commercialNav";
 import Image from "next/image";
 import DefaultImage from "@/assets/pictures/avatar.jpg";
 import { useForm } from "react-hook-form";
+import ViewCartButton from "../common/viewCartButton";
 
 export default function Header() {
   const [loggedIn, setLoggedIn] = useState<string | null>(null);
@@ -183,7 +185,9 @@ export default function Header() {
                 <Icons name="user" onClick={() => setOpenUser(true)} />
               </DialogTrigger>
               <DialogContent className="w-full max-w-96 max-h-[70vh] overflow-scroll p-6 rounded-none">
-                <DialogTitle className="text-2xl">LOGO</DialogTitle>
+                <DialogHeader>
+                  <DialogTitle className="text-2xl">LOGO</DialogTitle>
+                </DialogHeader>
                 <b className="text-3xl">WELCOME TO HISAKI COSMETIC</b>
                 <div className="font-thin text-gray-400 text-xs">
                   Get free shipping, discount vouchers and members only products
@@ -322,7 +326,7 @@ export default function Header() {
             </Dialog>
           )}
 
-          <Icons name="shoppingBag"></Icons>
+          <ViewCartButton />
         </div>
       </div>
     </header>

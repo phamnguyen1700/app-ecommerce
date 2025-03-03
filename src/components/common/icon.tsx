@@ -12,6 +12,7 @@ import {
   Bell,
   Heart,
   ShoppingBasket,
+  Trash,
 } from "lucide-react";
 
 const icons = {
@@ -27,6 +28,7 @@ const icons = {
   bell: Bell,
   heart: Heart,
   shoppingBasket: ShoppingBasket,
+  trash: Trash,
 };
 
 interface IconProps extends LucideProps {
