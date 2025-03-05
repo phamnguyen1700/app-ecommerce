@@ -63,8 +63,9 @@ export default function Header() {
   useEffect(() => {
     if (loggedIn !== null) {
       const interval = setInterval(() => {
-        dispatch(refreshTokenThunk());
-      }, 10 * 1000);
+        const refreshToken = localStorage.getItem("refreshToken") ?? "";
+        dispatch(refreshTokenThunk(refreshToken));
+      }, 1000 * 10);
 
       return () => clearInterval(interval);
     }
