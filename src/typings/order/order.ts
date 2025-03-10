@@ -1,6 +1,12 @@
 import { IAddress } from "../auth";
 import { IUser } from "../user";
 
+export interface IOrderState {
+  page?: number;
+  limit?: number;
+  status?: "Pending" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
+  search?: string;
+}
 
 export interface IOrderItem {
     product: string; 
@@ -13,7 +19,7 @@ export interface IOrder {
     totalAmount: number;
     paymentMethod: "Stripe"; 
     shippingAddress: Omit<IAddress, "_id">; 
-    user?: IUser["_id"];
+    user?: IUser;
     isRefunded?: boolean;
     isPaid?: boolean;
     paymentStatus?: "Pending" | "Completed" | "Failed";

@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { checkoutOrderService, createOrderService, getOrdersService, updatePaidStatusService } from "@/redux/services/Order";
-import { IOrder } from "@/typings/order/order";
+import { checkoutOrderService, createOrderService, getOrderAdminService, getOrdersService, updatePaidStatusService } from "@/redux/services/Order";
+import { IOrder, IOrderState } from "@/typings/order/order";
 import { toast } from "react-toastify";
 
 export const createOrderThunk = createAsyncThunk(
@@ -62,3 +62,17 @@ export const updatePaidStatusThunk = createAsyncThunk(
     }
   }
 );
+
+export const getOrderAdminThunk = createAsyncThunk(
+  "orders/getOrderAdmin",
+  async (params: IOrderState, { rejectWithValue }) => {
+    try {
+      const data = await getOrderAdminService(params);
+      console.log("orders:", data)
+      return data;
+    } catch (err) {
+      toast.error("Lấy danh sách đơn hàng không thành công!");
+      return rejectWithValue(err);
+    }
+  }
+)

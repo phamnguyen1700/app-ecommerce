@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "./nav/sidebar";
 import { SearchInput } from "../common/searchInput";
 import Icon from "@/components/common/icon";
@@ -10,9 +10,36 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { refreshTokenThunk } from "@/redux/thunks/Auth";
+import { AppDispatch } from "@/redux/store";
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
 
 export default function ManagementHeader() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const [loggedIn, setLoggedIn] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      router.push("/commercial/home");
+    } else {
+      setLoggedIn(token);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (loggedIn !== null) {
+      const interval = setInterval(() => {
+        const refreshToken = localStorage.getItem("refreshToken") ?? "";
+        dispatch(refreshTokenThunk(refreshToken));
+      }, 1000 * 60 * 10);
+
+      return () => clearInterval(interval);
+    }
+  }, [loggedIn, dispatch]);
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
@@ -48,9 +75,7 @@ export default function ManagementHeader() {
             <DropdownMenuItem>View Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              Logout
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
