@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Sidebar from "./sidebar";
+import Sidebar from "./nav/sidebar";
 import { SearchInput } from "../common/searchInput";
 import Icon from "@/components/common/icon";
 import {
@@ -16,6 +16,7 @@ export default function ManagementHeader() {
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     window.location.reload();
   };
