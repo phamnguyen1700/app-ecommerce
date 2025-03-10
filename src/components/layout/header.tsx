@@ -10,7 +10,6 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { useEffect, useState } from "react";
-import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import GoogleButton from "../common/googleButton";
 import {
@@ -28,6 +27,7 @@ import Image from "next/image";
 import DefaultImage from "@/assets/pictures/avatar.jpg";
 import { useForm } from "react-hook-form";
 import ViewCartButton from "../common/viewCartButton";
+import Link from "next/link";
 
 export default function Header() {
   const [loggedIn, setLoggedIn] = useState<string | null>(null);
@@ -65,7 +65,7 @@ export default function Header() {
       const interval = setInterval(() => {
         const refreshToken = localStorage.getItem("refreshToken") ?? "";
         dispatch(refreshTokenThunk(refreshToken));
-      }, 1000 * 10);
+      }, 1000 * 60 * 10);
 
       return () => clearInterval(interval);
     }
@@ -97,6 +97,7 @@ export default function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     window.location.reload();
   };
@@ -128,7 +129,7 @@ export default function Header() {
           {loggedIn ? (
             <SideDrawer direction="right">
               <DrawerTrigger asChild>
-                <Icons name="user" />
+                <Icons name="user" className=" cursor-pointer"/>
               </DrawerTrigger>
               <DrawerContent className="w-1/5 h-full rounded-none">
                 <DrawerTitle className="text-center text-lg font-semibold pt-2 pb-6 bg-gray-200 border border-b-gray-300">
@@ -160,12 +161,14 @@ export default function Header() {
                   >
                     <b className="text-sm">PLACE YOUR FEEDBACK →</b>
                   </Button>
-                  <Button
-                    variant="link"
-                    className="hover:bg-black hover:text-white"
-                  >
-                    <b className="text-sm">TRACKING YOUR ORDER →</b>
-                  </Button>
+                  <Link href="/commercial/orders">
+                    <Button
+                      variant="link"
+                      className="hover:bg-black hover:text-white"
+                    >
+                      <b className="text-sm">TRACKING YOUR ORDER →</b>
+                    </Button>
+                  </Link>
                 </div>
                 {/* Footer */}
                 <Button
@@ -300,13 +303,6 @@ export default function Header() {
                     />
                   </div>
                 )}
-
-                <div className="flex items-center">
-                  <Checkbox />
-                  <label htmlFor="keep-logged-in" className="text-sm ml-2">
-                    Keep me logged in.
-                  </label>
-                </div>
                 <Button
                   className="w-1/3 py-3 font-bold text-white bg-black hover:text-gray-300"
                   onClick={handleContinue}

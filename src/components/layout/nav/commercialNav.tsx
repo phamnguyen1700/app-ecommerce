@@ -1,38 +1,31 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+const navItems = [
+  { title: "Trang chủ", path: "/commercial/home" },
+  { title: "Sản phẩm", path: "/commercial/products" },
+  { title: "Blogs", path: "/commercial/blogs" },
+  { title: "Tin tức", path: "/commercial/news" },
+  { title: "Q/A", path: "/commercial/qa" },
+];
 
 const Navbar = () => {
+  const router = useRouter();
   return (
-    <div className="grid grid-cols-5 gap-20 place-items-center">
-      <Button className="font-light hover:border-b-8 hover:border-b-black no-underline hover:no-underline" variant="link">
-        <Link className="text-center no-underline hover:no-underline" href="/commercial/home" passHref>
-          Trang chủ
-        </Link>
-      </Button>
-
-      <Button className="font-light hover:border-b-8 hover:border-b-black no-underline hover:no-underline" variant="link">
-        <Link className="text-center no-underline hover:no-underline" href="/commercial/products" passHref>
-          Sản phẩm
-        </Link>
-      </Button>
-
-      <Button className="font-light hover:border-b-8 hover:border-b-black no-underline hover:no-underline" variant="link">
-        <Link className="text-center no-underline hover:no-underline" href="/commercial/blogs" passHref>
-          Blogs
-        </Link>
-      </Button>
-
-      <Button className="font-light hover:border-b-8 hover:border-b-black no-underline hover:no-underline" variant="link">
-        <Link className="text-center no-underline hover:no-underline" href="/commercial/news" passHref>
-          Tin tức
-        </Link>
-      </Button>
-      <Button className="font-light hover:border-b-8 hover:border-b-black no-underline hover:no-underline" variant="link">
-        <Link className="text-center no-underline hover:no-underline" href="/commercial/qa" passHref>
-          Q/A
-        </Link>
-      </Button>
-    </div>
+    <nav className="flex justify-center gap-10 py-4 border-b border-gray-300">
+      {navItems.map((item) => (
+        <Button
+          key={item.title}
+          onClick={() => router.push(item.path)}
+          variant="link"
+          className="relative font-light no-underline text-gray-800 hover:text-black"
+        >
+          {item.title}
+          <span className="absolute bottom-0 left-0 w-full h-[3px] bg-black scale-x-0 hover:scale-x-100 transition-transform duration-200"></span>
+        </Button>
+      ))}
+    </nav>
   );
 };
 

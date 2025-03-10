@@ -7,6 +7,15 @@ import {
 } from "@/components/common/sideDrawer";
 import Icon from "@/components/common/icon";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+
+const sidebarItems = [
+  { title: "SẢN PHẨM", path: "/management/products" },
+  { title: "ĐƠN HÀNG", path: "/management/orders" },
+  { title: "HÓA ĐƠN", path: "/management/invoices" },
+  { title: "NHÂN VIÊN", path: "/management/staff" },
+  { title: "NGƯỜI DÙNG", path: "/management/users" },
+];
 
 export default function Sidebar({
   open,
@@ -15,6 +24,8 @@ export default function Sidebar({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
+  const router = useRouter();
+
   return (
     <SideDrawer direction="left" open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
@@ -25,18 +36,16 @@ export default function Sidebar({
           HI NGUYỄN
         </DrawerTitle>
         <div className="container flex-col gap-3 mt-4 flex-grow">
-          <Button variant="link" className="hover:bg-black hover:text-white">
-            <b className="text-sm">SẢN PHẨM →</b>
-          </Button>
-          <Button variant="link" className="hover:bg-black hover:text-white">
-            <b className="text-sm">ĐƠN HÀNG →</b>
-          </Button>
-          <Button variant="link" className="hover:bg-black hover:text-white">
-            <b className="text-sm">HÓA ĐƠN →</b>
-          </Button>
-          <Button variant="link" className="hover:bg-black hover:text-white">
-            <b className="text-sm">NHÂN VIÊN →</b>
-          </Button>
+          {sidebarItems.map((item) => (
+            <Button
+              key={item.path}
+              variant="link"
+              className="hover:bg-black hover:text-white text-left px-4"
+              onClick={() => router.push(item.path)}
+            >
+              {item.title} →
+            </Button>
+          ))}
         </div>
         {/* Footer */}
         <div className="w-full border-t py-3 text-center text-xs text-gray-500">
