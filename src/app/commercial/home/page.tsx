@@ -9,7 +9,7 @@ import ProductCard from "@/components/common/productCard";
 import { AppDispatch } from "@/redux/store";
 import { getAllProductThunk } from "@/redux/thunks/Product";
 import { IProduct } from "@/typings/product";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 // Danh sách blog mẫu
@@ -44,7 +44,7 @@ export default function ProductsPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [products, setProducts] = useState<IProduct[]>([]);
 
-  const getProductAPI = async () => {
+  const getProductAPI = useCallback(async () => {
     try {
       const res = await dispatch(getAllProductThunk()).unwrap();
       setProducts(res);
@@ -52,11 +52,11 @@ export default function ProductsPage() {
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     getProductAPI();
-  }, [dispatch]);
+  }, [dispatch, getProductAPI]);
 
   return (
     <div className="container min-w-fit">

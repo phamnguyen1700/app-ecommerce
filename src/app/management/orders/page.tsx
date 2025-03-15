@@ -7,7 +7,7 @@ import { AppDispatch } from "@/redux/store";
 import { getOrderAdminThunk } from "@/redux/thunks/Order";
 import { IOrder, IOrderState } from "@/typings/order/order";
 import { formatDateToDisplay } from "@/utils/formatDateToDisplay";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 const DEFAULT_PARAMS: IOrderState = {
@@ -23,7 +23,7 @@ export default function ProductsPage() {
   const orderStatusTabs = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
   const [orders, setOrders] = useState<IOrder[]>([]);
 
-  const getOrdersAPI = async () => {
+  const getOrdersAPI = useCallback(async () => {
     try {
       const res = await dispatch(getOrderAdminThunk(params)).unwrap();
       setOrders(res.orders);
@@ -31,11 +31,11 @@ export default function ProductsPage() {
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [dispatch, params]);
 
   useEffect(() => {
     getOrdersAPI();
-  }, [dispatch, params]);
+  }, [getOrdersAPI]);
 
   const columns = [
     { colName: "Mã Đơn Hàng", render: (order: IOrder) => order._id },
@@ -78,7 +78,7 @@ export default function ProductsPage() {
 
       <Tabs
         value={params.status || "Pending"}
-        onValueChange={(status) => setParams({ ...params, status })}
+        onValueChange={(status) => setParams({ ...params, status: status as "Pending" | "Processing" | "Shipped" | "Delivered" | "Cancelled" })}
       >
         <TabsList className="flex space-x-4 border-b border-gray-200 pb-2">
           {orderStatusTabs.map((status) => (

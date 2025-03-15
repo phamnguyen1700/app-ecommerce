@@ -84,6 +84,7 @@ export default function ViewCartButton() {
         product: item.product,
         quantity: item.quantity,
         price: item.price,
+        image: item.image,
       })),
       totalAmount: cart.reduce(
         (total, item) => total + item.price * item.quantity,

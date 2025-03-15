@@ -12,6 +12,7 @@ export interface IOrderItem {
     product: string; 
     quantity: number;
     price: number;
+    image: string;
   }
  
 export interface IOrder {

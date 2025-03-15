@@ -28,6 +28,7 @@ import DefaultImage from "@/assets/pictures/avatar.jpg";
 import { useForm } from "react-hook-form";
 import ViewCartButton from "../common/viewCartButton";
 import Link from "next/link";
+import QuizDrawer from "../common/quiz";
 
 export default function Header() {
   const [loggedIn, setLoggedIn] = useState<string | null>(null);
@@ -326,6 +327,7 @@ export default function Header() {
           <ViewCartButton />
         </div>
       </div>
+      <QuizDrawer/>
     </header>
   );
 }

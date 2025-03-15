@@ -15,6 +15,7 @@ const sidebarItems = [
   { title: "HÓA ĐƠN", path: "/management/invoices" },
   { title: "NHÂN VIÊN", path: "/management/staff" },
   { title: "NGƯỜI DÙNG", path: "/management/users" },
+  { title: "QUIZ", path: "/management/quizs" },
 ];
 
 export default function Sidebar({
@@ -31,7 +32,7 @@ export default function Sidebar({
       <DrawerTrigger asChild>
         <Icon name="menu" />
       </DrawerTrigger>
-      <DrawerContent className="w-1/5 h-full rounded-none">
+      <DrawerContent className="max-w-44 h-full rounded-none">
         <DrawerTitle className="text-center text-lg font-semibold pt-2 pb-6 bg-gray-200 border border-b-gray-300">
           HI NGUYỄN
         </DrawerTitle>

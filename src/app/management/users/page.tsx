@@ -5,7 +5,7 @@ import CustomTable from "@/components/common/customTable";
 import { AppDispatch } from "@/redux/store";
 import { IUser } from "@/typings/user";
 import { TableColumn } from "@/typings/table";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { getAllUserThunk } from "@/redux/thunks/User";
@@ -14,20 +14,18 @@ export default function ManageUserPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [users, setUsers] = useState<IUser[]>([]);
 
-  const getUsersAPI = async () => {
+  const getUsersAPI = useCallback(async () => {
     try {
       const res = await dispatch(getAllUserThunk()).unwrap();
       setUsers(res.users);
     } catch (err) {
-      console.log(err);
+      console.error("Lỗi khi gọi API:", err);
     }
-  };
+  }, [dispatch]); 
 
   useEffect(() => {
     getUsersAPI();
-          console.log(users);
-
-  }, []);
+  }, [dispatch, getUsersAPI]);
 
   const userColumns: TableColumn<IUser>[] = [
     { colName: "Tên", render: (record: IUser) => record.name },

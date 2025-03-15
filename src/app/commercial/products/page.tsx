@@ -2,7 +2,7 @@
 
 import "@/app/globals.css";
 import { useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ProductCard from "@/components/common/productCard";
 import { getAllProductThunk } from "@/redux/thunks/Product";
 import { AppDispatch } from "@/redux/store";
@@ -12,7 +12,7 @@ export default function ProductsPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [products, setProducts] = useState<IProduct[]>([]);
 
-  const getProductAPI = async () => {
+  const getProductAPI = useCallback(async () => {
     try {
       const res = await dispatch(getAllProductThunk()).unwrap();
       setProducts(res);
@@ -20,11 +20,11 @@ export default function ProductsPage() {
     } catch (err) {
       console.log(err);
     }
-  };
+  },[dispatch]);
 
   useEffect(() => {
     getProductAPI();
-  }, [dispatch]);
+  }, [dispatch, getProductAPI]);
 
   return (
     <div className="container mx-auto p-4">

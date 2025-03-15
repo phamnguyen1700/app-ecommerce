@@ -16,3 +16,4 @@ export const getProductService = async (page: number, limit: number) => {
       throw err;
     }
   };
+  

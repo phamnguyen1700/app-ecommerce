@@ -47,7 +47,7 @@ const HomeSlider: React.FC<HomeSliderProps> = ({ title, children }) => {
       {/* Nút Prev */}
       <Button
         variant="link"
-        className={`absolute left-0 bg-black text-white top-1/2 transform -translate-y-1/2 px-4 text-sm font-light z-[999] ${
+        className={`absolute left-0 bg-black text-white top-1/2 transform -translate-y-1/2 px-4 text-sm font-light z-[100] ${
           canScrollPrev ? "opacity-100" : "opacity-75 cursor-not-allowed"
         }`}
         onClick={() => emblaApi?.scrollPrev()}
@@ -59,7 +59,7 @@ const HomeSlider: React.FC<HomeSliderProps> = ({ title, children }) => {
       {/* Nút Next */}
       <Button
         variant="link"
-        className={`absolute right-0 bg-black text-white top-1/2 transform -translate-y-1/2 px-4 text-sm font-light z-[999] ${
+        className={`absolute right-0 bg-black text-white top-1/2 transform -translate-y-1/2 px-4 text-sm font-light z-[100] ${
           canScrollNext ? "opacity-100" : "opacity-50 cursor-not-allowed"
         }`}
         onClick={() => emblaApi?.scrollNext()}

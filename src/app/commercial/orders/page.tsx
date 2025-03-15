@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { IOrder } from "@/typings/order/order";
@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { getOrdersThunk } from "@/redux/thunks/Order";
 import { formatDateToDisplay } from "@/utils/formatDateToDisplay";
 import CheckoutButton from "@/components/common/checkoutButton";
+import Image from "next/image";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<IOrder[]>([]);
@@ -16,7 +17,7 @@ export default function OrdersPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null); // Trạng thái thanh toán
   const dispatch = useDispatch<AppDispatch>();
 
-  const getOrdersAPI = async () => {
+  const getOrdersAPI = useCallback(async () => {
     try {
       const res = await dispatch(getOrdersThunk()).unwrap();
       setOrders(res.orders);
@@ -24,11 +25,11 @@ export default function OrdersPage() {
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     getOrdersAPI();
-  }, [dispatch]);
+  }, [getOrdersAPI]);
 
   useEffect(() => {
     setClientSecret(null);
@@ -92,9 +93,11 @@ export default function OrdersPage() {
                     <CardContent className="flex gap-4 items-center p-2">
                       {/* Ảnh sản phẩm */}
                       <div className="w-20 h-20 bg-gray-100 flex-shrink-0 rounded">
-                        <img
-                          src={item.image}
-                          alt={item.product}
+                        <Image
+                          src={item.image} 
+                          alt={item.product} 
+                          width={500} 
+                          height={300} 
                           className="w-full h-full object-cover rounded"
                         />
                       </div>

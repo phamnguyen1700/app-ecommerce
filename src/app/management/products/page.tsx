@@ -7,7 +7,7 @@ import { getProductThunk } from "@/redux/thunks/Product";
 import { IProduct } from "@/typings/product";
 import { TableColumn } from "@/typings/table";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import {
   Pagination,
@@ -26,21 +26,21 @@ export default function ManageProductPage() {
   const [totalPages, setTotalPages] = useState(1);
   const productsPerPage = 10; // Giới hạn 10 sản phẩm mỗi trang
 
-  const getProductAPI = async (page: number) => {
-    try {
-      const res = await dispatch(
-        getProductThunk({ page, limit: productsPerPage })
-      ).unwrap();
-      setProducts(res.products);
-      setTotalPages(res.totalPages);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
+  const getProductAPI = useCallback(
+    async (page: number) => {
+      try {
+        const res = await dispatch(getProductThunk({ page, limit: productsPerPage })).unwrap();
+        setProducts(res.products);
+        setTotalPages(res.totalPages);
+      } catch (err) {
+        console.error("Lỗi khi gọi API:", err);
+      }
+    },
+    [dispatch, productsPerPage] 
+  );
   useEffect(() => {
     getProductAPI(currentPage);
-  }, [currentPage]);
+  }, [currentPage, getProductAPI]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
