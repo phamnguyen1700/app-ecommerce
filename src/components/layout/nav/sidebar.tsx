@@ -12,8 +12,6 @@ import { useRouter } from "next/navigation";
 const sidebarItems = [
   { title: "SẢN PHẨM", path: "/management/products" },
   { title: "ĐƠN HÀNG", path: "/management/orders" },
-  { title: "HÓA ĐƠN", path: "/management/invoices" },
-  { title: "NHÂN VIÊN", path: "/management/staff" },
   { title: "NGƯỜI DÙNG", path: "/management/users" },
   { title: "QUIZ", path: "/management/quizs" },
 ];

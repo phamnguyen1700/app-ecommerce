@@ -10,12 +10,29 @@ import { getOrdersThunk } from "@/redux/thunks/Order";
 import { formatDateToDisplay } from "@/utils/formatDateToDisplay";
 import CheckoutButton from "@/components/common/checkoutButton";
 import Image from "next/image";
+import { IProduct } from "@/typings/product";
+import { getAllProductThunk } from "@/redux/thunks/Product";
 
 export default function OrdersPage() {
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [selectedOrder, setSelectedOrder] = useState(orders[0]);
   const [clientSecret, setClientSecret] = useState<string | null>(null); // Trạng thái thanh toán
   const dispatch = useDispatch<AppDispatch>();
+
+  const getProductsAPI = useCallback(async () => {
+    try {
+      const res = await dispatch(getAllProductThunk()).unwrap();
+      setProducts(res);
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    getProductsAPI();
+  }, [getProductsAPI]);
 
   const getOrdersAPI = useCallback(async () => {
     try {
@@ -88,39 +105,52 @@ export default function OrdersPage() {
             </CardHeader>
             <CardContent>
               <div className="max-h-[400px] overflow-auto">
-                {selectedOrder.items.map((item, idx) => (
-                  <Card key={idx} className="mb-2 relative overflow-hidden">
-                    <CardContent className="flex gap-4 items-center p-2">
-                      {/* Ảnh sản phẩm */}
-                      <div className="w-20 h-20 bg-gray-100 flex-shrink-0 rounded">
-                        <Image
-                          src={item.image} 
-                          alt={item.product} 
-                          width={500} 
-                          height={300} 
-                          className="w-full h-full object-cover rounded"
-                        />
-                      </div>
-
-                      {/* Thông tin sản phẩm */}
-                      <div className="flex-1 relative">
-                        <div className="flex justify-between mb-14">
-                          <div className="font-semibold uppercase text-sm">
-                            {item.product}
+                {selectedOrder.items.map((item, idx) => {
+                  const productDetails = products.find(
+                    (p) => p._id === item.product
+                  );
+                  return (
+                    <Card key={idx} className="mb-2 relative overflow-hidden">
+                      <CardContent className="flex gap-4 items-center p-2">
+                        {!productDetails ? (
+                          <div className="flex-1 text-center text-gray-500">
+                            <p>Sản phẩm không tồn tại hoặc đã bị xóa</p>
                           </div>
-                          <div className="font-bold text-sm ml-auto">
-                            {item.price}
-                          </div>
-                        </div>
+                        ) : (
+                          <>
+                            {/* Ảnh sản phẩm */}
+                            <div className="w-20 h-20 bg-gray-100 flex-shrink-0 rounded">
+                              <Image
+                                src={productDetails.images[0] ?? "/assets/pictures/image.png"}
+                                alt={productDetails.name}
+                                width={500}
+                                height={300}
+                                className="w-full h-full object-cover rounded"
+                              />
+                            </div>
 
-                        {/* Số lượng góc dưới phải */}
-                        <span className="absolute bottom-0 right-0 text-xs text-gray-500">
-                          Số lượng: {item.quantity}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                            {/* Thông tin sản phẩm */}
+                            <div className="flex-1 relative">
+                              <div className="flex justify-between mb-14">
+                                <div className="font-semibold uppercase text-sm">
+                                  {productDetails.name}
+                                </div>
+                                <div className="font-bold text-sm ml-auto">
+                                  {item.price}
+                                </div>
+                              </div>
+
+                              {/* Số lượng góc dưới phải */}
+                              <span className="absolute bottom-0 right-0 text-xs text-gray-500">
+                                Số lượng: {item.quantity}
+                              </span>
+                            </div>
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
               <div className="mb-2 flex justify-between items-center font-semibold">
                 <div>Tổng</div>

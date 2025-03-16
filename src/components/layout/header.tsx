@@ -24,7 +24,6 @@ import { loginThunk, refreshTokenThunk } from "@/redux/thunks/Auth";
 import { AppDispatch } from "@/redux/store";
 import Navbar from "@/components/layout/nav/commercialNav";
 import Image from "next/image";
-import DefaultImage from "@/assets/pictures/avatar.jpg";
 import { useForm } from "react-hook-form";
 import ViewCartButton from "../common/viewCartButton";
 import Link from "next/link";
@@ -136,7 +135,7 @@ export default function Header() {
                 <DrawerTitle className="text-center text-lg font-semibold pt-2 pb-6 bg-gray-200 border border-b-gray-300">
                   HI NGUYỄN
                   <Image
-                    src={DefaultImage}
+                    src="/assets/pictures/image.png"
                     alt="User Avatar"
                     width={160}
                     height={160}

@@ -10,7 +10,6 @@ export const getAllProductThunk = createAsyncThunk(
             console.log(data);
             return data.products;
         } catch (err) {
-            console.log(err);
             return rejectWithValue(err);
         }
     }
