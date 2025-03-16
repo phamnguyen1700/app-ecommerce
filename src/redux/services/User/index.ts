@@ -1,7 +1,7 @@
-import { IUser } from "@/typings/user";
+import { IUserFilter } from "@/typings/user";
 import { API } from "@/utils/Api";
 
-export const getAllUserService = async (params?: Partial<IUser>) => {
+export const getAllUserService = async (params?: Partial<IUserFilter>) => {
     try {
       const res = await API.get("/user/all", { params });
       return res.data;  

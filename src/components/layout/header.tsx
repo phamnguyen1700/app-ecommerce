@@ -28,8 +28,11 @@ import { useForm } from "react-hook-form";
 import ViewCartButton from "../common/viewCartButton";
 import Link from "next/link";
 import QuizDrawer from "../common/quiz";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
+  const router = useRouter();
+  const [permission, setPermission] = useState<boolean>(false);
   const [loggedIn, setLoggedIn] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const [openUser, setOpenUser] = useState(false);
@@ -46,11 +49,16 @@ export default function Header() {
   const [step, setStep] = useState<"email" | "password">("email");
   const [showPassword, setShowPassword] = useState(false);
 
-  console.log(watch("loginEmail"));
-  console.log(watch("password"));
-  console.log(loggedIn);
-
   useEffect(() => {
+    const user = localStorage.getItem("user");
+      if (user) {
+        const parseUser = JSON.parse(user);
+        if (parseUser.role === "admin") {
+          setPermission(true);
+          console.log("Permission granted");
+        }
+      }
+
     if (loggedIn === null) {
       const token = localStorage.getItem("accessToken");
       setLoggedIn(token);
@@ -129,7 +137,7 @@ export default function Header() {
           {loggedIn ? (
             <SideDrawer direction="right">
               <DrawerTrigger asChild>
-                <Icons name="user" className=" cursor-pointer"/>
+                <Icons name="user" className=" cursor-pointer" />
               </DrawerTrigger>
               <DrawerContent className="w-1/5 h-full rounded-none">
                 <DrawerTitle className="text-center text-lg font-semibold pt-2 pb-6 bg-gray-200 border border-b-gray-300">
@@ -170,6 +178,15 @@ export default function Header() {
                     </Button>
                   </Link>
                 </div>
+                {permission && (
+                  <Button
+                    variant="link"
+                    className="hover:bg-black hover:text-white"
+                    onClick={() => router.push("/management/products")}
+                  >
+                    <b className="text-sm">MANAGE</b>
+                  </Button>
+                )}
                 {/* Footer */}
                 <Button
                   variant="link"
@@ -326,7 +343,7 @@ export default function Header() {
           <ViewCartButton />
         </div>
       </div>
-      <QuizDrawer/>
+      <QuizDrawer />
     </header>
   );
 }

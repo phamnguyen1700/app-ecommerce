@@ -7,21 +7,57 @@ import { IUser, IUserFilter } from "@/typings/user";
 import { TableColumn } from "@/typings/table";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Button } from "@/components/ui/button";
 import { getAllUserThunk, toggleBanUserThunk } from "@/redux/thunks/User";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function ManageUserPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [users, setUsers] = useState<IUser[]>([]);
-  const [filterState, setFilterState] = useState<Partial<IUserFilter>>({
-    page: 1,
-    limit: 10,
+  const [inputFilterState, setInputFilterState] = useState<
+    Partial<IUserFilter>
+  >({
     name: "",
     email: "",
     role: undefined,
     isVerified: undefined,
   });
+
+  const [filterState, setFilterState] = useState<Partial<IUserFilter>>({
+    page: 1,
+    limit: 10,
+  });
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setInputFilterState((prev) => ({
+      ...prev,
+      [name]: value || undefined,
+    }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setInputFilterState((prev) => ({
+      ...prev,
+      [name]: value || undefined,
+    }));
+  };
+
+  const handleSearch = () => {
+    setFilterState({
+      ...inputFilterState,
+      page: 1,
+      limit: 10,
+    });
+  };
 
   const getUsersAPI = useCallback(async () => {
     try {
@@ -36,18 +72,20 @@ export default function ManageUserPage() {
     getUsersAPI();
   }, [dispatch, getUsersAPI]);
 
-    // ✅ Hàm xử lý khi bật/tắt switch
-    const handleBanToggle = async (id: string, isBanned: boolean) => {
-      try {
-        await dispatch(toggleBanUserThunk({ id, isBanned })).unwrap();
-        // Cập nhật trạng thái user sau khi ban/unban thành công
-        setUsers((prevUsers) =>
-          prevUsers.map((user) => (user._id === id ? { ...user, isBanned } : user))
-        );
-      } catch (err) {
-        console.error("Lỗi khi cập nhật trạng thái ban:", err);
-      }
-    };
+  // ✅ Hàm xử lý khi bật/tắt switch
+  const handleBanToggle = async (id: string, isBanned: boolean) => {
+    try {
+      await dispatch(toggleBanUserThunk({ id, isBanned })).unwrap();
+      // Cập nhật trạng thái user sau khi ban/unban thành công
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === id ? { ...user, isBanned } : user
+        )
+      );
+    } catch (err) {
+      console.error("Lỗi khi cập nhật trạng thái ban:", err);
+    }
+  };
 
   const userColumns: TableColumn<IUser>[] = [
     {
@@ -84,9 +122,10 @@ export default function ManageUserPage() {
     },
     {
       colName: "Địa chỉ",
-      render: (record: IUser) => (
-        <div>Trả cho t cái địa chỉ theo model address nha lộc</div>
-      ),
+      render: (record: IUser) =>
+        record.address
+          ? `${record.address.street}, ${record.address.city}, ${record.address.province}`
+          : "N/A",
     },
     {
       colName: "Số điện thoại",
@@ -119,7 +158,41 @@ export default function ManageUserPage() {
         <h1 className="text-xl font-bold">Quản lý người dùng</h1>
       </div>
 
-      <div>FILTER</div>
+      <div className="flex gap-4 mb-4 border-b-2 border-gray-300 pb-4">
+        <Input
+          name="name"
+          placeholder="Tên người dùng"
+          onChange={handleFilterChange}
+        />
+        <Input name="email" placeholder="Email" onChange={handleFilterChange} />
+
+        <Select onValueChange={(value) => handleSelectChange("role", value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Chọn vai trò" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="--">Tất cả</SelectItem>
+            <SelectItem value="manager">Manager</SelectItem>
+            <SelectItem value="staff">Staff</SelectItem>
+            <SelectItem value="user">User</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select
+          onValueChange={(value) => handleSelectChange("isVerified", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Xác minh" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="--">Tất cả</SelectItem>
+            <SelectItem value="true">Đã xác minh</SelectItem>
+            <SelectItem value="false">Chưa xác minh</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Button onClick={handleSearch}>Tìm kiếm</Button>
+      </div>
 
       <CustomTable columns={userColumns} records={users} />
     </div>
