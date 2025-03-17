@@ -55,7 +55,7 @@ export default function QuizDrawer() {
 
   return (
     <>
-      <div className="fixed right-5 top-[50%] -translate-y-1/2 z-[50]">
+      <div className="fixed right-5 top-[50%] -translate-y-1/2 z-[500]">
         <Button
           variant="default"
           className="rounded-l-lg rounded-r-none rotate-90 origin-bottom-right shadow-lg bg-white text-black text-xs px-2 hover:bg-white"
@@ -66,7 +66,7 @@ export default function QuizDrawer() {
       </div>
 
       <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent className="w-[450px] h-full fixed right-0 top-0 rounded-none overflow-y-auto overflow-x-hidden z-[200]">
+      <DrawerContent className="w-[450px] h-full fixed right-0 top-0 rounded-none overflow-y-auto overflow-x-hidden z-[500]">
       <DrawerHeader>
             <DrawerTitle className="text-xl font-bold">Trả lời Quiz</DrawerTitle>
           <p className="text-sm mb-4">Chọn đáp án phù hợp nhất cho mỗi câu hỏi.</p>

@@ -111,7 +111,9 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full">
+<header className="w-full sticky top-0 bg-white shadow-md z-[400]">
+
+
       <div className="w-full h-7 pt-1.5 font-semibold bg-black text-white text-center text-xs">
         KHUYẾN MÃI THÊM Ở ĐÂY
       </div>
@@ -139,7 +141,7 @@ export default function Header() {
               <DrawerTrigger asChild>
                 <Icons name="user" className=" cursor-pointer" />
               </DrawerTrigger>
-              <DrawerContent className="w-1/5 h-full rounded-none">
+              <DrawerContent className="w-1/5 h-full rounded-none z-[500]">
                 <DrawerTitle className="text-center text-lg font-semibold pt-2 pb-6 bg-gray-200 border border-b-gray-300">
                   HI NGUYỄN
                   <Image
