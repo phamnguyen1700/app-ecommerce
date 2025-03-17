@@ -207,7 +207,7 @@ export default function Header() {
               <DialogTrigger asChild>
                 <Icons name="user" onClick={() => setOpenUser(true)} />
               </DialogTrigger>
-              <DialogContent className="w-full max-w-96 max-h-[70vh] overflow-scroll p-6 rounded-none">
+              <DialogContent className="w-full max-w-96 max-h-[70vh] overflow-scroll p-6 rounded-none z-[500]">
                 <DialogHeader>
                   <DialogTitle className="text-2xl">LOGO</DialogTitle>
                 </DialogHeader>
