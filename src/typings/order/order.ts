@@ -9,23 +9,31 @@ export interface IOrderState {
 }
 
 export interface IOrderItem {
-    product: string; 
-    quantity: number;
-    price: number;
-    image: string;
-  }
- 
+  product: string;
+  quantity: number;
+  price: number;
+  image: string;
+}
+
+export type IOrderStatus =
+  | "Pending"
+  | "Processing"
+  | "Shipped"
+  | "Delivered"
+  | "Cancelled"
+  | undefined;
+
 export interface IOrder {
-    items: IOrderItem[];
-    totalAmount: number;
-    paymentMethod: "Stripe"; 
-    shippingAddress: Omit<IAddress, "_id">; 
-    user?: IUser;
-    isRefunded?: boolean;
-    isPaid?: boolean;
-    paymentStatus?: "Pending" | "Completed" | "Failed";
-    orderStatus?: "Pending" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
-    createdAt?: string;
-    updatedAt?: string;
-    _id?: string;
-  }
+  items: IOrderItem[];
+  totalAmount: number;
+  paymentMethod: "Stripe";
+  shippingAddress: Omit<IAddress, "_id">;
+  user?: IUser;
+  isRefunded?: boolean;
+  isPaid?: boolean;
+  paymentStatus?: "Pending" | "Completed" | "Failed";
+  orderStatus?: IOrderStatus;
+  createdAt?: string;
+  updatedAt?: string;
+  _id?: string;
+}

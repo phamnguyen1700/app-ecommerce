@@ -16,6 +16,7 @@ import { AppDispatch } from "@/redux/store";
 import { IOrder } from "@/typings/order/order";
 import { createOrderThunk } from "@/redux/thunks/Order";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 interface CartItem {
   product: string;
@@ -26,6 +27,7 @@ interface CartItem {
 }
 
 export default function ViewCartButton() {
+  const router = useRouter();
   const [cart, setCart] = useState<CartItem[]>([]);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -103,9 +105,10 @@ export default function ViewCartButton() {
       await dispatch(createOrderThunk(orderData)).unwrap();
       toast.success("Đơn hàng đã được tạo thành công!");
       localStorage.removeItem(CART_STORAGE_KEY);
+      router.push("/commercial/orders");
       window.dispatchEvent(new Event("cartUpdated"));
     } catch (error) {
-        toast.error("Lỗi khi tạo đơn hàng, vui lòng thử lại!");
+      toast.error("Lỗi khi tạo đơn hàng, vui lòng thử lại!");
       console.error(error);
     }
   };
@@ -136,12 +139,21 @@ export default function ViewCartButton() {
                 className="flex items-center gap-4 border-b pb-2"
               >
                 <div className="relative w-16 h-16">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    className="object-cover rounded"
-                  />
+                  {item.image ? (
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      className="object-cover rounded"
+                    />
+                  ) : (
+                    <Image
+                      src="/assets/pictures/default-image.png" // Ảnh mặc định
+                      alt="Ảnh mặc định"
+                      fill
+                      className="object-cover rounded"
+                    />
+                  )}
                 </div>{" "}
                 <div className="flex-1">
                   <div className="flex justify-between items-center">

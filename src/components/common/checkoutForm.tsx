@@ -47,7 +47,7 @@ export default function CheckoutForm({ orderId }: CheckoutFormProps) {
         updatePaidStatusThunk({ orderId, paymentIntentId: paymentIntent.id })
       );
 
-      console.log("Thanh toán thành công!");
+      window.location.reload();
     }
 
     setLoading(false);

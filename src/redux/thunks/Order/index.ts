@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { checkoutOrderService, createOrderService, getOrderAdminService, getOrdersService, updatePaidStatusService } from "@/redux/services/Order";
-import { IOrder, IOrderState } from "@/typings/order/order";
+import { cancelOrderService, checkoutOrderService, createOrderService, getOrderAdminService, getOrdersService, updateOrderStatusService, updatePaidStatusService } from "@/redux/services/Order";
+import { IOrder, IOrderState, IOrderStatus } from "@/typings/order/order";
 import { toast } from "react-toastify";
 
 export const createOrderThunk = createAsyncThunk(
@@ -72,6 +72,36 @@ export const getOrderAdminThunk = createAsyncThunk(
       return data;
     } catch (err) {
       toast.error("Lấy danh sách đơn hàng không thành công!");
+      return rejectWithValue(err);
+    }
+  }
+)
+
+export const updateOrderStatusThunk = createAsyncThunk(
+  "orders/updateOrderStatus",
+  async ({ id, orderStatus }: { id: string; orderStatus: IOrderStatus }, { rejectWithValue }) => {
+    try {
+      const data = await updateOrderStatusService(id, orderStatus);
+      toast.success("Cập nhật trạng thái đơn hàng thành công!");
+
+      return data;
+    } catch (err) {
+      toast.error("Cập nhật trạng thái đơn hàng không thành công!");
+      return rejectWithValue(err);
+    }
+  } 
+)
+
+export const cancelOrderThunk = createAsyncThunk(
+  "orders/cancelOrder",
+  async ({ id }: { id: string }, { rejectWithValue }) => {
+    try {
+      const data = await cancelOrderService(id);
+      toast.success("Hủy đơn hàng thành công!");
+
+      return data;
+    } catch (err) {
+      toast.error("Hủy đơn hàng không thành công!");
       return rejectWithValue(err);
     }
   }

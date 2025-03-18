@@ -4,7 +4,7 @@ import "@/app/globals.css";
 import CustomTable from "@/components/common/customTable";
 import { AppDispatch } from "@/redux/store";
 import { getProductThunk } from "@/redux/thunks/Product";
-import { IProduct } from "@/typings/product";
+import { IProduct, IProductFilter } from "@/typings/product";
 import { TableColumn } from "@/typings/table";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
@@ -18,33 +18,97 @@ import {
   PaginationLink,
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { IBrand } from "@/typings/brand";
+import { getBrandThunk } from "@/redux/thunks/Brand";
+import PriceSlider from "@/components/common/priceSlider";
 
 export default function ManageProductPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [products, setProducts] = useState<IProduct[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const productsPerPage = 10; // Giới hạn 10 sản phẩm mỗi trang
+  const [brands, setBrands] = useState<IBrand[]>([]); // Lưu danh sách brand
+  const [filterParams, setFilterParams] = useState({
+    keyword: "",
+    category: "",
+    brandName: "",
+    skinType: "",
+    minPrice: "",
+    maxPrice: "",
+  });
+  const [params, setParams] = useState({
+    page: 1,
+    limit: 10,
+    keyword: "",
+    category: "",
+    brandName: "",
+    skinType: "",
+    minPrice: "",
+    maxPrice: "",
+  });
 
-  const getProductAPI = useCallback(
-    async (page: number) => {
-      try {
-        const res = await dispatch(getProductThunk({ page, limit: productsPerPage })).unwrap();
-        setProducts(res.products);
-        setTotalPages(res.totalPages);
-      } catch (err) {
-        console.error("Lỗi khi gọi API:", err);
-      }
-    },
-    [dispatch, productsPerPage] 
-  );
+  const [totalPages, setTotalPages] = useState(1);
+
+  const updateFilterParams = <K extends keyof IProductFilter>(
+    key: K,
+    value: IProductFilter[K]
+  ) => {
+    setFilterParams((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const handleSearch = () => {
+    setParams((prev) => ({
+      ...prev,
+      ...filterParams,
+      page: 1, // Reset về trang 1 khi tìm kiếm
+    }));
+  };
+
+  const getbrandAPI = useCallback(async () => {
+    try {
+      const res = await dispatch(getBrandThunk()).unwrap();
+      setBrands(res.brands);
+    } catch {
+      console.error("Lỗi khi gọi API");
+    }
+  }, [dispatch]);
+
+  const getProductAPI = useCallback(async () => {
+    try {
+      const res = await dispatch(
+        getProductThunk({
+          ...params,
+          minPrice: params.minPrice,
+          maxPrice: params.maxPrice,
+        })
+      ).unwrap();
+      setProducts(res.products);
+      setTotalPages(res.totalPages);
+    } catch (err) {
+      console.error("Lỗi khi gọi API:", err);
+    }
+  }, [dispatch, params]);
+
   useEffect(() => {
-    getProductAPI(currentPage);
-  }, [currentPage, getProductAPI]);
+    getProductAPI();
+    getbrandAPI();
+  }, [getProductAPI, params.page, getbrandAPI]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+      setParams((prev) => ({
+        ...prev,
+        page,
+      }));
     }
   };
 
@@ -71,7 +135,7 @@ export default function ManageProductPage() {
     {
       colName: "Thương hiệu",
       render: (record: IProduct) => (
-        <div className="text-xs text-center">{record.brand}</div>
+        <div className="text-xs text-center">{record.brand?.brandName}</div>
       ),
     },
     {
@@ -117,23 +181,97 @@ export default function ManageProductPage() {
         <Button>Thêm sản phẩm</Button>
       </div>
 
-      <div>FILTER</div>
+      {/*  <ProductFilter  */}
+      <div className="flex gap-4 mb-4">
+        <Input
+          placeholder="Tìm kiếm sản phẩm..."
+          value={filterParams.keyword}
+          onChange={(e) => updateFilterParams("keyword", e.target.value)}
+        />
 
-      
+        <Select
+          value={filterParams.brandName}
+          onValueChange={(value) => updateFilterParams("brandName", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Chọn thương hiệu" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="--">Tất cả</SelectItem>
+            {brands.map((brand) => (
+              <SelectItem key={brand._id} value={brand.brandName}>
+                {brand.brandName}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={filterParams.category}
+          onValueChange={(value) => updateFilterParams("category", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Chọn danh mục" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="--">Tất cả</SelectItem>
+            <SelectItem value="Cleanser">Cleanser</SelectItem>
+            <SelectItem value="Moisturizer">Moisturizer</SelectItem>
+            <SelectItem value="Serum">Serum</SelectItem>
+            <SelectItem value="Sunscreen">Sunscreen</SelectItem>
+            <SelectItem value="Toner">Toner</SelectItem>
+            <SelectItem value="Mask">Mask</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={filterParams.skinType}
+          onValueChange={(value) => updateFilterParams("skinType", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Loại da" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="--">Tất cả</SelectItem>
+            <SelectItem value="oily">Oily</SelectItem>
+            <SelectItem value="dry">Dry</SelectItem>
+            <SelectItem value="combination">Combination</SelectItem>
+            <SelectItem value="sensitive">Sensitive</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <PriceSlider
+          minPrice={Number(filterParams.minPrice) || 0}
+          maxPrice={Number(filterParams.maxPrice) || 50000000}
+          minLimit={0}
+          maxLimit={50000000}
+          step={10000}
+          onChange={([min, max]) => {
+            updateFilterParams("minPrice", min.toString());
+            updateFilterParams("maxPrice", max.toString());
+          }}
+        />
+
+        <Button onClick={handleSearch}>Tìm kiếm</Button>
+      </div>
+
       <CustomTable columns={productColumns} records={products} />
+
+      {/* Pagination */}
       <Pagination className="flex justify-end">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              onClick={() => handlePageChange(params.page - 1)}
+              disabled={params.page === 1}
             />
           </PaginationItem>
 
           {Array.from({ length: totalPages }, (_, index) => (
             <PaginationItem key={index}>
               <PaginationLink
-                isActive={currentPage === index + 1}
+                isActive={params.page === index + 1}
                 onClick={() => handlePageChange(index + 1)}
               >
                 {index + 1}
@@ -143,8 +281,8 @@ export default function ManageProductPage() {
 
           <PaginationItem>
             <PaginationNext
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(params.page + 1)}
+              disabled={params.page === totalPages}
             />
           </PaginationItem>
         </PaginationContent>

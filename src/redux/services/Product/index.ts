@@ -1,3 +1,4 @@
+import { IProductFilter } from "@/typings/product";
 import { API } from "@/utils/Api"; 
 
 export const getAllProductService = async () => {
@@ -7,13 +8,7 @@ export const getAllProductService = async () => {
 };
 
 
-export const getProductService = async (page: number, limit: number) => {
-    try {
-      const res = await API.get(`/products?page=${page}&limit=${limit}`);
-      return res.data;
-    } catch (err) {
-      console.error("Error fetching products:", err);
-      throw err;
-    }
-  };
-  
+export const getProductService = async (params: Partial<IProductFilter>) => {
+  const response = await API.get("/products", { params });
+  return response.data;
+};

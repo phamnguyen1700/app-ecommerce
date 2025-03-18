@@ -1,8 +1,11 @@
+import { IBrand } from "../brand";
+
+
 export interface IProduct {
   _id: string;
   name: string;
   description: string;
-  brand: string;
+  brand?: IBrand;
   category: string;
   price: number;
   stock: number;
@@ -17,7 +20,17 @@ export interface IProduct {
   updatedAt: string;
 }
 
-//type của card
 export interface IProductCardProps {
-    product: IProduct;
-  }
+  product: IProduct;
+}
+
+export interface IProductFilter {
+  page?: number;
+  limit?: number;
+  keyword?: string;
+  category?: string;
+  brandName?: string;
+  skinType?: string;
+  minPrice?: string;
+  maxPrice?: string;
+}

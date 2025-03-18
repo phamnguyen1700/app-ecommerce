@@ -1,5 +1,5 @@
 import { API } from "@/utils/Api";
-import { IOrder, IOrderState } from "@/typings/order/order";
+import { IOrder, IOrderState, IOrderStatus } from "@/typings/order/order";
 
 export const createOrderService = async (orderData: IOrder) => {
   try {
@@ -60,3 +60,26 @@ export const getOrderAdminService = async (params: IOrderState) => {
     throw error;
   }
 };
+
+export const updateOrderStatusService = async (
+  orderId: string,
+  orderStatus: IOrderStatus
+) => {  
+  try {
+    const res = await API.put(`/orders/${orderId}/status`, { orderStatus });
+    return res.data;
+  } catch (err) {
+    console.error("Error updating order status:", err);
+    throw err;
+  }
+}
+
+export const cancelOrderService = async (id: string) => {
+  try {
+    const res = await API.put(`/orders/${id}/cancel`);
+    return res.data;
+  } catch (err) {
+    console.error("Error cancelling order:", err);
+    throw err;
+  }
+}

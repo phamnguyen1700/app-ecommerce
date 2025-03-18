@@ -52,6 +52,12 @@ export default function OrdersPage() {
     setClientSecret(null);
   }, [selectedOrder]);
 
+  useEffect(() => {
+    if (orders.length > 0 && !selectedOrder) {
+      setSelectedOrder(orders[0]);
+    }
+  }, [orders]); // eslint-disable-line
+
   return (
     <div className="container mx-auto py-8 flex gap-4">
       {/* Danh sách order (trái) */}
@@ -71,11 +77,17 @@ export default function OrdersPage() {
                   <p className="text-lg font-extralight">{order._id}</p>
                 </div>
                 <span
-                  className={`${
-                    order.orderStatus === "Shipped"
+                  className={`px-2 py-1 w-[150px] inline-block text-center rounded font-semibold transition-all duration-300 ${
+                    order.orderStatus === "Cancelled"
+                      ? "bg-gray-300 text-gray-700"
+                      : order.orderStatus === "Shipped"
                       ? "bg-green-100 text-green-700"
+                      : order.orderStatus === "Delivered"
+                      ? "bg-green-100 text-green-700 animate-pulse"
+                      : order.orderStatus === "Processing"
+                      ? "bg-yellow-100 text-yellow-700 animate-pulse"
                       : "bg-yellow-100 text-yellow-700"
-                  } px-2 py-1 rounded`}
+                  }`}
                 >
                   {order.orderStatus}
                 </span>
@@ -121,7 +133,10 @@ export default function OrdersPage() {
                             {/* Ảnh sản phẩm */}
                             <div className="w-20 h-20 bg-gray-100 flex-shrink-0 rounded">
                               <Image
-                                src={productDetails.images[0] ?? "/assets/pictures/image.png"}
+                                src={
+                                  productDetails.images[0] ??
+                                  "/assets/pictures/image.png"
+                                }
                                 alt={productDetails.name}
                                 width={500}
                                 height={300}
