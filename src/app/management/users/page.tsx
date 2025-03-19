@@ -1,10 +1,12 @@
 "use client";
 
+import type React from "react";
+
 import "@/app/globals.css";
 import CustomTable from "@/components/common/customTable";
-import { AppDispatch } from "@/redux/store";
-import { IUser, IUserFilter } from "@/typings/user";
-import { TableColumn } from "@/typings/table";
+import type { AppDispatch } from "@/redux/store";
+import type { IUser, IUserFilter } from "@/typings/user";
+import type { TableColumn } from "@/typings/table";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { getAllUserThunk, toggleBanUserThunk } from "@/redux/thunks/User";
@@ -18,6 +20,15 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Search, Filter, X } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 export default function ManageUserPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -47,7 +58,7 @@ export default function ManageUserPage() {
   const handleSelectChange = (name: string, value: string) => {
     setInputFilterState((prev) => ({
       ...prev,
-      [name]: value || undefined,
+      [name]: value === "--" ? undefined : value,
     }));
   };
 
@@ -56,6 +67,15 @@ export default function ManageUserPage() {
       ...inputFilterState,
       page: 1,
       limit: 10,
+    });
+  };
+
+  const clearFilters = () => {
+    setInputFilterState({
+      name: "",
+      email: "",
+      role: undefined,
+      isVerified: undefined,
     });
   };
 
@@ -70,7 +90,7 @@ export default function ManageUserPage() {
 
   useEffect(() => {
     getUsersAPI();
-  }, [dispatch, getUsersAPI]);
+  }, [getUsersAPI]);
 
   // ✅ Hàm xử lý khi bật/tắt switch
   const handleBanToggle = async (id: string, isBanned: boolean) => {
@@ -87,29 +107,58 @@ export default function ManageUserPage() {
     }
   };
 
-  const userColumns: TableColumn<IUser>[] = [
+  // Mobile-optimized columns
+  const mobileUserColumns: TableColumn<IUser>[] = [
     {
-      colName: "Tên",
+      colName: "Người dùng",
       render: (record: IUser) => (
-        <div className="text-xs text-left">{record.name}</div>
+        <div className="py-2">
+          <div className="font-medium">{record.name}</div>
+          <div className="text-xs text-gray-500">{record.email}</div>
+          <div className="flex items-center mt-1 text-xs">
+            <span className="bg-gray-100 px-2 py-0.5 rounded mr-2">
+              {record.role}
+            </span>
+            <span>{record.isVerified ? "✅" : "❌"}</span>
+          </div>
+        </div>
       ),
     },
     {
-      colName: "Email",
+      colName: "Trạng thái",
       render: (record: IUser) => (
-        <div className="text-xs text-left">{record.email}</div>
+        <div className="flex justify-end">
+          <Switch
+            checked={record.isBanned}
+            onCheckedChange={() =>
+              handleBanToggle(record._id, !record.isBanned)
+            }
+          />
+        </div>
       ),
+    },
+  ];
+
+  // Desktop columns
+  const desktopUserColumns: TableColumn<IUser>[] = [
+    {
+      colName: "Tên",
+      render: (record: IUser) => <div className="text-sm">{record.name}</div>,
+    },
+    {
+      colName: "Email",
+      render: (record: IUser) => <div className="text-sm">{record.email}</div>,
     },
     {
       colName: "Vai trò",
       render: (record: IUser) => (
-        <div className="text-xs text-center">{record.role}</div>
+        <div className="text-sm text-center">{record.role}</div>
       ),
     },
     {
       colName: "Xác minh",
       render: (record: IUser) => (
-        <div className="text-xs text-center">
+        <div className="text-sm text-center">
           {record.isVerified ? "✅" : "❌"}
         </div>
       ),
@@ -117,7 +166,7 @@ export default function ManageUserPage() {
     {
       colName: "Loại da",
       render: (record: IUser) => (
-        <div className="text-xs text-center">{record.skinType || "N/A"}</div>
+        <div className="text-sm text-center">{record.skinType || "N/A"}</div>
       ),
     },
     {
@@ -130,13 +179,13 @@ export default function ManageUserPage() {
     {
       colName: "Số điện thoại",
       render: (record: IUser) => (
-        <div className="text-xs text-left">{record.email}</div>
+        <div className="text-sm">{record.email || "N/A"}</div>
       ),
     },
     {
       colName: "Ngày tạo",
       render: (record: IUser) => (
-        <div className="text-xs text-center">
+        <div className="text-sm text-center">
           {new Date(record.createdAt).toLocaleDateString()}
         </div>
       ),
@@ -153,21 +202,141 @@ export default function ManageUserPage() {
   ];
 
   return (
-    <div className="p-6">
+    <div className="p-3 sm:p-6">
+      {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">Quản lý người dùng</h1>
+
+        {/* Mobile Filter Button */}
+        <div className="sm:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Filter className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="h-[80vh]">
+              <SheetHeader className="mb-4">
+                <SheetTitle>Bộ lọc</SheetTitle>
+              </SheetHeader>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">
+                    Tên người dùng
+                  </label>
+                  <Input
+                    name="name"
+                    placeholder="Nhập tên người dùng"
+                    value={inputFilterState.name || ""}
+                    onChange={handleFilterChange}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1 block">
+                    Email
+                  </label>
+                  <Input
+                    name="email"
+                    placeholder="Nhập email"
+                    value={inputFilterState.email || ""}
+                    onChange={handleFilterChange}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1 block">
+                    Vai trò
+                  </label>
+                  <Select
+                    value={inputFilterState.role || "--"}
+                    onValueChange={(value) => handleSelectChange("role", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn vai trò" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="--">Tất cả</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="staff">Staff</SelectItem>
+                      <SelectItem value="user">User</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1 block">
+                    Xác minh
+                  </label>
+                  <Select
+                    value={
+                      inputFilterState.isVerified !== undefined
+                        ? String(inputFilterState.isVerified)
+                        : "--"
+                    }
+                    onValueChange={(value) =>
+                      handleSelectChange("isVerified", value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Trạng thái xác minh" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="--">Tất cả</SelectItem>
+                      <SelectItem value="true">Đã xác minh</SelectItem>
+                      <SelectItem value="false">Chưa xác minh</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button className="flex-1" onClick={handleSearch}>
+                    <Search className="h-4 w-4 mr-2" />
+                    Tìm kiếm
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={clearFilters}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Xóa bộ lọc
+                  </Button>
+                </div>
+              </div>
+
+              <SheetClose className="absolute top-4 right-4">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </SheetClose>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
 
-      <div className="flex gap-4 mb-4 border-b-2 border-gray-300 pb-4">
+      {/* Desktop Filters */}
+      <div className="hidden sm:flex flex-wrap gap-3 mb-4 border-b border-gray-200 pb-4">
         <Input
           name="name"
           placeholder="Tên người dùng"
+          value={inputFilterState.name || ""}
           onChange={handleFilterChange}
+          className="w-[200px]"
         />
-        <Input name="email" placeholder="Email" onChange={handleFilterChange} />
+        <Input
+          name="email"
+          placeholder="Email"
+          value={inputFilterState.email || ""}
+          onChange={handleFilterChange}
+          className="w-[200px]"
+        />
 
-        <Select onValueChange={(value) => handleSelectChange("role", value)}>
-          <SelectTrigger>
+        <Select
+          value={inputFilterState.role || "--"}
+          onValueChange={(value) => handleSelectChange("role", value)}
+        >
+          <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Chọn vai trò" />
           </SelectTrigger>
           <SelectContent>
@@ -179,9 +348,14 @@ export default function ManageUserPage() {
         </Select>
 
         <Select
+          value={
+            inputFilterState.isVerified !== undefined
+              ? String(inputFilterState.isVerified)
+              : "--"
+          }
           onValueChange={(value) => handleSelectChange("isVerified", value)}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Xác minh" />
           </SelectTrigger>
           <SelectContent>
@@ -191,10 +365,26 @@ export default function ManageUserPage() {
           </SelectContent>
         </Select>
 
-        <Button onClick={handleSearch}>Tìm kiếm</Button>
+        <Button onClick={handleSearch}>
+          <Search className="h-4 w-4 mr-2" />
+          Tìm kiếm
+        </Button>
+
+        <Button variant="outline" onClick={clearFilters}>
+          <X className="h-4 w-4 mr-2" />
+          Xóa bộ lọc
+        </Button>
       </div>
 
-      <CustomTable columns={userColumns} records={users} />
+      {/* Mobile Table */}
+      <div className="sm:hidden">
+        <CustomTable columns={mobileUserColumns} records={users} />
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden sm:block overflow-x-auto">
+        <CustomTable columns={desktopUserColumns} records={users} />
+      </div>
     </div>
   );
 }

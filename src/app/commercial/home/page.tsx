@@ -6,9 +6,9 @@ import Banner from "@/components/common/banner";
 import BlogCard from "@/components/common/blogCard";
 import HomeSlider from "@/components/common/homeSlider";
 import ProductCard from "@/components/common/productCard";
-import { AppDispatch } from "@/redux/store";
+import type { AppDispatch } from "@/redux/store";
 import { getAllProductThunk } from "@/redux/thunks/Product";
-import { IProduct } from "@/typings/product";
+import type { IProduct } from "@/typings/product";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
@@ -59,12 +59,15 @@ export default function ProductsPage() {
   }, [dispatch, getProductAPI]);
 
   return (
-    <div className="container min-w-fit">
+    <div className="container mx-auto px-2 sm:px-4">
       <Banner title="OIL SKIN" />
-      <div className="w-full px-4 pt-2 pb-2">
+      <div className="w-full px-2 sm:px-4 pt-2 pb-2">
         <HomeSlider title="Mục yêu thích">
           {products.map((product, index) => (
-            <div className="flex-shrink-0 w-1/4" key={product._id || index}>
+            <div
+              className="flex-shrink-0 w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 px-1 sm:px-2"
+              key={product._id || index}
+            >
               <ProductCard product={product} />
             </div>
           ))}
@@ -72,19 +75,25 @@ export default function ProductsPage() {
       </div>
       <Banner title="OIL SKIN" description="Cho làn da khô thoáng!" />
       {/* Slider cho Blog */}
-      <div className="w-full px-4 pt-2 pb-2">
+      <div className="w-full px-2 sm:px-4 pt-2 pb-2">
         <HomeSlider title="Bài viết nổi bật">
           {blogs.map((blog, index) => (
-            <div className="flex-shrink-0 w-1/3" key={index}>
+            <div
+              className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/3 px-1 sm:px-2"
+              key={index}
+            >
               <BlogCard {...blog} />
             </div>
           ))}
         </HomeSlider>
       </div>
-      <div className="w-full px-4 pt-2 pb-2">
+      <div className="w-full px-2 sm:px-4 pt-2 pb-2">
         <HomeSlider title="Best seller">
           {products.map((product, index) => (
-            <div className="flex-shrink-0 w-1/4" key={product._id || index}>
+            <div
+              className="flex-shrink-0 w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 px-1 sm:px-2"
+              key={product._id || index}
+            >
               <ProductCard product={product} />
             </div>
           ))}
@@ -97,7 +106,7 @@ export default function ProductsPage() {
           "The 3-Stripes have appeared on medal stands all around the world, but they've also had an influence that extends far beyond the field of play...",
           "adidas Originals apparel is a stylish complement to our lifestyle shoes. Our streetwear collections pull from the archives to put a modern spin on classics...",
         ]}
-        logo="/logo-adidas.png" 
+        logo="/logo-adidas.png"
       />
     </div>
   );

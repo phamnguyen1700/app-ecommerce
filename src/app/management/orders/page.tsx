@@ -1,27 +1,39 @@
 "use client";
 
+import type React from "react";
+
 import "@/app/globals.css";
 import CustomTable from "@/components/common/customTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AppDispatch } from "@/redux/store";
+import type { AppDispatch } from "@/redux/store";
 import {
   cancelOrderThunk,
   getOrderAdminThunk,
   updateOrderStatusThunk,
 } from "@/redux/thunks/Order";
-import { IOrder, IOrderState, IOrderStatus } from "@/typings/order/order";
+import type { IOrder, IOrderState, IOrderStatus } from "@/typings/order/order";
 import { formatDateToDisplay } from "@/utils/formatDateToDisplay";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import {
+  Filter,
+  Search,
+  X,
+  Calendar,
+  ShoppingBag,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 const DEFAULT_PARAMS: IOrderState = {
   page: 1,
@@ -30,7 +42,7 @@ const DEFAULT_PARAMS: IOrderState = {
   search: undefined,
 };
 
-export default function ProductsPage() {
+export default function OrdersPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [params, setParams] = useState(DEFAULT_PARAMS);
   const orderStatusTabs = [
@@ -44,22 +56,16 @@ export default function ProductsPage() {
   const [hoveredOrder, setHoveredOrder] = useState<string | null>(null);
   const [inputFilter, setInputFilter] = useState({
     search: "",
-    // isPaid: undefined,
   });
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputFilter({ ...inputFilter, search: e.target.value });
   };
 
-  // const handleSelectChange = (value: string) => {
-  //   setInputFilter({ ...inputFilter, isPaid: value === "all" ? undefined : value === "true" });
-  // };
-
   const handleSearch = () => {
     setParams((prev) => ({
       ...prev,
       search: inputFilter.search || undefined,
-      // isPaid: inputFilter.isPaid,
     }));
   };
 
@@ -91,7 +97,8 @@ export default function ProductsPage() {
     getOrdersAPI();
   }, [getOrdersAPI]);
 
-  const columns = [
+  // Desktop columns
+  const desktopColumns = [
     {
       colName: "Mã Đơn Hàng",
       render: (order: IOrder) => (
@@ -120,12 +127,12 @@ export default function ProductsPage() {
       colName: "Trạng Thái",
       render: (order: IOrder) => {
         return order.orderStatus === "Cancelled" ? (
-          <span className="px-3 py-1 rounded text-center min-w-[140px] inline-block bg-gray-500 text-white cursor-not-allowed">
+          <span className="px-2 sm:px-3 py-1 rounded text-center min-w-[100px] sm:min-w-[140px] inline-block bg-gray-500 text-white cursor-not-allowed text-xs">
             Đã hủy
           </span>
         ) : (
           <span
-            className={`px-3 py-1 rounded text-center min-w-[140px] inline-block transition-all duration-200 ${
+            className={`px-2 sm:px-3 py-1 rounded text-center min-w-[100px] sm:min-w-[140px] inline-block transition-all duration-200 text-xs ${
               order.isPaid
                 ? "bg-green-500 text-green-900 hover:bg-green-500 hover:text-white cursor-pointer"
                 : "bg-red-500 text-red-900 hover:bg-red-500 hover:text-white cursor-pointer"
@@ -157,7 +164,6 @@ export default function ProductsPage() {
         );
       },
     },
-
     {
       colName: "Ngày Đặt",
       render: (order: IOrder) => (
@@ -168,9 +174,152 @@ export default function ProductsPage() {
     },
   ];
 
+  // Mobile columns
+  const mobileColumns = [
+    {
+      colName: "Đơn hàng",
+      render: (order: IOrder) => (
+        <div className="py-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="h-4 w-4 text-gray-500" />
+              <span className="text-xs font-medium truncate max-w-[120px]">
+                {order._id}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-gray-500" />
+              <span className="text-xs">
+                {formatDateToDisplay(order.createdAt!)}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-sm font-medium">
+              {order.user?.name || "N/A"}
+            </div>
+            <div className="text-sm font-bold">{`${order.totalAmount} VNĐ`}</div>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <div className="text-xs text-gray-500">{order.paymentMethod}</div>
+            {order.orderStatus === "Cancelled" ? (
+              <span className="px-2 py-1 rounded text-center inline-block bg-gray-500 text-white text-xs">
+                Đã hủy
+              </span>
+            ) : (
+              <div className="flex gap-2">
+                {order.isPaid ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-green-600 border-green-600 hover:bg-green-50 text-xs h-8 px-2"
+                    onClick={() => {
+                      if (order.orderStatus === "Processing") {
+                        handleProcess(order._id || "", "Processing");
+                      } else {
+                        handleShipping();
+                      }
+                    }}
+                  >
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    {order.orderStatus === "Processing" ? "Giao hàng" : "Duyệt"}
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-red-600 border-red-600 hover:bg-red-50 text-xs h-8 px-2"
+                    onClick={() => handleCancel(order._id || "")}
+                  >
+                    <XCircle className="h-3 w-3 mr-1" />
+                    Hủy đơn
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-4">Quản Lý Đơn Hàng</h1>
+    <div className="container mx-auto p-3 sm:p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-xl font-bold">Quản Lý Đơn Hàng</h1>
+
+        {/* Mobile Filter Button */}
+        <div className="sm:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Filter className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="h-[50vh]">
+              <SheetHeader className="mb-4">
+                <SheetTitle>Bộ lọc đơn hàng</SheetTitle>
+              </SheetHeader>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">
+                    Tìm kiếm
+                  </label>
+                  <Input
+                    name="search"
+                    placeholder="Tìm theo email"
+                    value={inputFilter.search}
+                    onChange={handleFilterChange}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1 block">
+                    Trạng thái
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {orderStatusTabs.map((status) => (
+                      <Button
+                        key={status}
+                        variant="outline"
+                        className={`text-xs ${
+                          params.status === status ? "bg-black text-white" : ""
+                        }`}
+                        onClick={() =>
+                          setParams({
+                            ...params,
+                            status: status as
+                              | "Pending"
+                              | "Processing"
+                              | "Shipped"
+                              | "Delivered"
+                              | "Cancelled",
+                          })
+                        }
+                      >
+                        {status}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <Button className="w-full" onClick={handleSearch}>
+                  <Search className="h-4 w-4 mr-2" />
+                  Tìm kiếm
+                </Button>
+              </div>
+
+              <SheetClose className="absolute top-4 right-4">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </SheetClose>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
 
       <Tabs
         value={params.status || "Pending"}
@@ -186,47 +335,60 @@ export default function ProductsPage() {
           })
         }
       >
-        <TabsList className="flex space-x-5 border-b-2 border-gray-300 pb-7 pt-2">
-          {orderStatusTabs.map((status) => (
-            <TabsTrigger
-              key={status}
-              value={status}
-              className={`w-full px-4 py-2 rounded-md text-sm font-semibold ${
-                params.status === status
-                  ? "bg-black text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              {status}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        {/* Desktop Tabs */}
+        <div className="hidden sm:block overflow-x-auto pb-2">
+          <TabsList className="flex space-x-2 sm:space-x-5 border-b-2 border-gray-300 pb-4 sm:pb-7 pt-2 w-max min-w-full">
+            {orderStatusTabs.map((status) => (
+              <TabsTrigger
+                key={status}
+                value={status}
+                className={`px-4 py-2 rounded-md text-sm font-semibold ${
+                  params.status === status
+                    ? "bg-black text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                {status}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
-        <div className="flex gap-4 mb-4 border-b-2 border-gray-300 pb-2 pt-2">
+        {/* Desktop Search */}
+        <div className="hidden sm:flex gap-4 mb-4 border-b-2 border-gray-300 pb-4 pt-2">
           <Input
             name="search"
             placeholder="Tìm theo email"
             value={inputFilter.search}
             onChange={handleFilterChange}
+            className="max-w-md"
           />
 
-          {/* <Select onValueChange={handleSelectChange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Chọn trạng thái thanh toán" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả</SelectItem>
-            <SelectItem value="true">Đã thanh toán</SelectItem>
-            <SelectItem value="false">Chưa thanh toán</SelectItem>
-          </SelectContent>
-        </Select> */}
+          <Button onClick={handleSearch}>
+            <Search className="h-4 w-4 mr-2" />
+            Tìm kiếm
+          </Button>
+        </div>
 
-          <Button onClick={handleSearch}>Tìm kiếm</Button>
+        {/* Mobile Status Indicator */}
+        <div className="sm:hidden mb-4">
+          <div className="text-sm font-medium text-gray-500">
+            Trạng thái:{" "}
+            <span className="font-bold text-black">{params.status}</span>
+          </div>
         </div>
 
         {orderStatusTabs.map((status) => (
           <TabsContent key={status} value={status} className="mt-4">
-            <CustomTable columns={columns} records={orders} />
+            {/* Mobile Table */}
+            <div className="sm:hidden">
+              <CustomTable columns={mobileColumns} records={orders} />
+            </div>
+
+            {/* Desktop Table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <CustomTable columns={desktopColumns} records={orders} />
+            </div>
           </TabsContent>
         ))}
       </Tabs>
