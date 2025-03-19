@@ -8,7 +8,7 @@ import {
   manageBrandService,
 } from "@/redux/services/Brand";
 import { IBrandFilter } from "@/typings/brand";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 // 🟢 Lấy danh sách thương hiệu
 export const getBrandThunk = createAsyncThunk(
@@ -29,7 +29,7 @@ export const createBrandThunk = createAsyncThunk(
   async (brandName: string, { rejectWithValue }) => {
     try {
       const response = await createBrandService(brandName);
-      return response.data;
+      return response.data; 
     } catch (error) {
       return rejectWithValue(error);
     }

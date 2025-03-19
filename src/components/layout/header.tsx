@@ -8,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "../ui/dialog";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
@@ -18,12 +17,11 @@ import {
   DrawerContent,
   DrawerTitle,
   DrawerTrigger,
-  DrawerClose,
 } from "@/components/common/sideDrawer";
 import Icon from "@/components/common/icon";
 import { useDispatch } from "react-redux";
 import { loginThunk, refreshTokenThunk } from "@/redux/thunks/Auth";
-import type { AppDispatch } from "@/redux/store";
+import { AppDispatch } from "@/redux/store";
 import Navbar from "@/components/layout/nav/commercialNav";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
@@ -31,7 +29,6 @@ import ViewCartButton from "../common/viewCartButton";
 import Link from "next/link";
 import QuizDrawer from "../common/quiz";
 import { useRouter } from "next/navigation";
-import { Menu, X, ChevronRight, LogOut } from "lucide-react";
 
 export default function Header() {
   const router = useRouter();
@@ -40,9 +37,6 @@ export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
   const [openUser, setOpenUser] = useState(false);
   const [signUp, setSignUp] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-
   const { register, setValue, watch, reset } = useForm({
     defaultValues: {
       name: "",
@@ -52,28 +46,27 @@ export default function Header() {
       loginPassword: "",
     },
   });
-
   const [step, setStep] = useState<"email" | "password">("email");
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const user = localStorage.getItem("user");
-    if (user) {
-      const parseUser = JSON.parse(user);
-      if (parseUser.role === "admin") {
-        setPermission(true);
+      if (user) {
+        const parseUser = JSON.parse(user);
+        if (parseUser.role === "admin") {
+          setPermission(true);
+          console.log("Permission granted");
+        }
       }
-    }
 
     if (loggedIn === null) {
       const token = localStorage.getItem("accessToken");
       setLoggedIn(token);
     }
-
     if (openUser) {
       reset();
     }
-  }, [loggedIn, openUser, reset]);
+  }, [loggedIn, openUser, dispatch, reset]);
 
   useEffect(() => {
     if (loggedIn !== null) {
@@ -96,6 +89,10 @@ export default function Header() {
       setValue("loginEmail", watch("email"));
       setStep("password");
     } else if (step === "password") {
+      console.log("Logging in with:", {
+        email: watch("loginEmail"),
+        password: watch("loginPassword"),
+      });
       dispatch(
         loginThunk({
           email: watch("loginEmail"),
@@ -113,24 +110,15 @@ export default function Header() {
     window.location.reload();
   };
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
-  const toggleMobileSearch = () => {
-    setMobileSearchOpen(!mobileSearchOpen);
-  };
-
   return (
-    <header className="w-full sticky top-0 bg-white shadow-md z-[400]">
-      {/* Promo banner */}
+<header className="w-full sticky top-0 bg-white shadow-md z-[400]">
+
+
       <div className="w-full h-7 pt-1.5 font-semibold bg-black text-white text-center text-xs">
         KHUYẾN MÃI THÊM Ở ĐÂY
       </div>
-
-      {/* Secondary nav links - hidden on mobile */}
-      <div className="h-3 hidden sm:block">
-        <div className="flex justify-end -space-x-0.5 px-4 md:px-8">
+      <div className="h-3">
+        <div className="flex justify-end -space-x-0.5 ">
           <Button className="text-xs font-thin" variant="link">
             Contact
           </Button>
@@ -142,296 +130,221 @@ export default function Header() {
           </Button>
         </div>
       </div>
+      <div className="grid grid-cols-3 items-center pt-3 px-8 border-b">
+        <div className="flex justify-start">LOGO</div>
+        <Navbar />
+        <div className="flex justify-end gap-5">
+          <SearchInput />
 
-      {/* Main header section */}
-      <div className="flex flex-wrap items-center justify-between pt-3 px-4 md:px-8 border-b pb-3">
-        {/* Logo and mobile menu button */}
-        <div className="flex items-center gap-3">
-          <button
-            className="p-1.5 rounded-md md:hidden"
-            onClick={toggleMobileMenu}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? (
-              <X size={20} className="text-gray-700" />
-            ) : (
-              <Menu size={20} className="text-gray-700" />
-            )}
-          </button>
-
-          <div className="font-bold text-lg">LOGO</div>
-        </div>
-
-        {/* Navigation - desktop */}
-        <div className="hidden md:block">
-          <Navbar />
-        </div>
-
-        {/* Right side icons */}
-        <div className="flex items-center gap-3 sm:gap-5">
-          <div className="hidden sm:block">
-            <SearchInput />
-          </div>
-
-          {/* User account icon/button */}
           {loggedIn ? (
             <SideDrawer direction="right">
               <DrawerTrigger asChild>
-                <button
-                  className="p-1.5 rounded-full hover:bg-gray-100"
-                  aria-label="User account"
-                >
-                  <Icons name="user" className="cursor-pointer" />
-                </button>
+                <Icons name="user" className=" cursor-pointer" />
               </DrawerTrigger>
-              <DrawerContent className="w-full sm:w-3/4 md:w-1/2 lg:w-1/3 xl:w-1/4 h-full rounded-none z-[500]">
-                <div className="flex justify-between items-center p-4 bg-gray-200 border-b border-gray-300">
-                  <DrawerTitle className="text-lg font-semibold">
-                    HI NGUYỄN
-                  </DrawerTitle>
-                  <DrawerClose asChild>
-                    <button
-                      className="p-1.5 rounded-full hover:bg-gray-300"
-                      aria-label="Close"
-                    >
-                      <X size={18} />
-                    </button>
-                  </DrawerClose>
-                </div>
-
-                <div className="flex justify-center py-4 bg-gray-100">
+              <DrawerContent className="w-1/5 h-full rounded-none z-[500]">
+                <DrawerTitle className="text-center text-lg font-semibold pt-2 pb-6 bg-gray-200 border border-b-gray-300">
+                  HI NGUYỄN
                   <Image
-                    src="/placeholder.svg?height=120&width=120"
+                    src="/assets/pictures/image.png"
                     alt="User Avatar"
-                    width={120}
-                    height={120}
-                    className="rounded-full border-2 border-white shadow-md"
+                    width={160}
+                    height={160}
+                    className="justify-self-center p-2 rounded-full"
                   />
-                </div>
-
-                <div className="flex flex-col gap-1 p-4">
+                </DrawerTitle>
+                <div className="container flex-col gap-3 mt-4 flex-grow">
                   <Button
-                    variant="ghost"
-                    className="justify-start py-3 hover:bg-gray-100 text-left"
+                    variant="link"
+                    className="hover:bg-black hover:text-white"
                   >
-                    <span className="font-medium">VISIT YOUR ACCOUNT</span>
-                    <ChevronRight className="ml-auto h-5 w-5" />
+                    <b className="text-sm">VISIT YOUR ACCOUNT →</b>
                   </Button>
-
                   <Button
-                    variant="ghost"
-                    className="justify-start py-3 hover:bg-gray-100 text-left"
+                    variant="link"
+                    className="hover:bg-black hover:text-white"
                   >
-                    <span className="font-medium">VIEW YOUR HISTORY</span>
-                    <ChevronRight className="ml-auto h-5 w-5" />
+                    <b className="text-sm">VIEW YOUR HISTORY →</b>
                   </Button>
-
                   <Button
-                    variant="ghost"
-                    className="justify-start py-3 hover:bg-gray-100 text-left"
+                    variant="link"
+                    className="hover:bg-black hover:text-white"
                   >
-                    <span className="font-medium">PLACE YOUR FEEDBACK</span>
-                    <ChevronRight className="ml-auto h-5 w-5" />
+                    <b className="text-sm">PLACE YOUR FEEDBACK →</b>
                   </Button>
-
-                  <Link href="/commercial/orders" className="w-full">
+                  <Link href="/commercial/orders">
                     <Button
-                      variant="ghost"
-                      className="justify-start py-3 hover:bg-gray-100 text-left w-full"
+                      variant="link"
+                      className="hover:bg-black hover:text-white"
                     >
-                      <span className="font-medium">TRACKING YOUR ORDER</span>
-                      <ChevronRight className="ml-auto h-5 w-5" />
+                      <b className="text-sm">TRACKING YOUR ORDER →</b>
                     </Button>
                   </Link>
-
-                  {permission && (
-                    <Button
-                      variant="ghost"
-                      className="justify-start py-3 hover:bg-gray-100 text-left"
-                      onClick={() => router.push("/management/products")}
-                    >
-                      <span className="font-medium">MANAGE</span>
-                      <ChevronRight className="ml-auto h-5 w-5" />
-                    </Button>
-                  )}
                 </div>
-
-                {/* Footer */}
-                <div className="mt-auto">
+                {permission && (
                   <Button
-                    variant="ghost"
-                    className="justify-start py-3 hover:bg-gray-100 text-left w-full text-red-600"
-                    onClick={handleLogout}
+                    variant="link"
+                    className="hover:bg-black hover:text-white"
+                    onClick={() => router.push("/management/products")}
                   >
-                    <LogOut className="mr-2 h-5 w-5" />
-                    <span className="font-medium">LOGOUT</span>
+                    <b className="text-sm">MANAGE</b>
                   </Button>
-
-                  <div className="w-full border-t py-3 text-center text-xs text-gray-500">
-                    © 2024 HISAKI COSMETIC. All rights reserved.
-                  </div>
+                )}
+                {/* Footer */}
+                <Button
+                  variant="link"
+                  className="hover:bg-black hover:text-white"
+                  onClick={handleLogout}
+                >
+                  <b className="text-sm">LOGOUT</b>
+                </Button>
+                <div className="w-full border-t py-3 text-center text-xs text-gray-500">
+                  © 2024 HISAKI COSMETIC. All rights reserved.
                 </div>
               </DrawerContent>
             </SideDrawer>
           ) : (
             <Dialog open={openUser} onOpenChange={setOpenUser}>
               <DialogTrigger asChild>
-                <button
-                  className="p-1.5 rounded-full hover:bg-gray-100"
-                  aria-label="User account"
-                >
-                  <Icons name="user" />
-                </button>
+                <Icons name="user" onClick={() => setOpenUser(true)} />
               </DialogTrigger>
-              <DialogContent className="w-[95%] sm:w-[450px] max-w-md max-h-[90vh] overflow-auto p-4 sm:p-6 rounded-md z-[500]">
-                <DialogHeader className="flex justify-between items-center">
+              <DialogContent className="w-full max-w-96 max-h-[70vh] overflow-scroll p-6 rounded-none z-[500]">
+                <DialogHeader>
                   <DialogTitle className="text-2xl">LOGO</DialogTitle>
-                  <DialogClose asChild>
-                    <button
-                      className="p-1.5 rounded-full hover:bg-gray-100"
-                      aria-label="Close"
-                    >
-                      <X size={18} />
-                    </button>
-                  </DialogClose>
                 </DialogHeader>
+                <b className="text-3xl">WELCOME TO HISAKI COSMETIC</b>
+                <div className="font-thin text-gray-400 text-xs">
+                  Get free shipping, discount vouchers and members only products
+                  when you’re in adiClub.
+                </div>
 
-                <div className="mt-4">
-                  <h2 className="text-xl sm:text-2xl font-bold mb-2">
-                    WELCOME TO HISAKI COSMETIC
-                  </h2>
-                  <p className="text-gray-500 text-sm mb-6">
-                    Get free shipping, discount vouchers and members only
-                    products when you're in adiClub.
-                  </p>
+                {watch("loginEmail") === "" ? (
+                  <div>
+                    <b className="text-xs">
+                      Log in or{" "}
+                      <span
+                        onClick={handleSignUp}
+                        className="hover:font-bold hover:underline cursor-pointer transition-all duration-200"
+                      >
+                        sign up
+                      </span>{" "}
+                      - it&apos;s free
+                    </b>
 
-                  {watch("loginEmail") === "" ? (
-                    <div className="space-y-4">
-                      <div className="text-sm">
-                        <span className="font-medium">Log in or </span>
-                        <button
-                          onClick={handleSignUp}
-                          className="text-blue-600 hover:underline font-medium"
-                        >
-                          sign up
-                        </button>
-                        <span> - it's free</span>
+                    {signUp === true ? (
+                      <div className="flex-col">
+                        <Input
+                          type="text"
+                          placeholder="NAME *"
+                          className="mt-2"
+                          {...register("name", { required: true })}
+                        />
+                        <Input
+                          type="email"
+                          placeholder="EMAIL ADDRESS *"
+                          className="mt-2"
+                          {...register("email", { required: true })}
+                        />
+                        <div className="w-full justify-items-end ">
+                          {showPassword ? (
+                            <div className="flex justify-end">
+                              <Button
+                                className="font-semibold text-gray-600 hover:text-black "
+                                variant="link"
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
+                                <Icon name="eye" />
+                                Show
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex justify-end">
+                              <Button
+                                className="font-semibold text-gray-600 hover:text-black "
+                                variant="link"
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
+                                <Icon name="eye" />
+                                Hide
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                        <Input
+                          type={showPassword ? "password" : "text"}
+                          placeholder="Password *"
+                          {...register("password", { required: true })}
+                        />
                       </div>
-
-                      {signUp ? (
-                        <div className="space-y-3">
-                          <Input
-                            type="text"
-                            placeholder="NAME *"
-                            {...register("name", { required: true })}
-                          />
-                          <Input
-                            type="email"
-                            placeholder="EMAIL ADDRESS *"
-                            {...register("email", { required: true })}
-                          />
-                          <div className="relative">
-                            <Input
-                              type={showPassword ? "text" : "password"}
-                              placeholder="PASSWORD *"
-                              {...register("password", { required: true })}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                            >
-                              <Icon name="eye" />
-                            </button>
-                          </div>
+                    ) : (
+                      <div className="flex-col">
+                        <GoogleButton />
+                        <Input
+                          type="email"
+                          placeholder="EMAIL ADDRESS *"
+                          className="mt-2"
+                          {...register("email", { required: true })}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <div className="w-full justify-items-end ">
+                      {showPassword ? (
+                        <div className="flex justify-end">
+                          <Button
+                            className="font-semibold text-gray-600 hover:text-black "
+                            variant="link"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            <Icon name="eye" />
+                            Show
+                          </Button>
                         </div>
                       ) : (
-                        <div className="space-y-3">
-                          <GoogleButton />
-                          <div className="relative mt-4">
-                            <Input
-                              type="email"
-                              placeholder="EMAIL ADDRESS *"
-                              {...register("email", { required: true })}
-                            />
-                          </div>
+                        <div className="flex justify-end">
+                          <Button
+                            className="font-semibold text-gray-600 hover:text-black "
+                            variant="link"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            <Icon name="eye" />
+                            Hide
+                          </Button>
                         </div>
                       )}
                     </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="relative">
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          placeholder="PASSWORD *"
-                          {...register("loginPassword", { required: true })}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                        >
-                          <Icon name="eye" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
 
-                  <Button
-                    className="w-full sm:w-auto mt-6 py-2.5 px-6 font-bold text-white bg-black hover:bg-gray-800"
-                    onClick={handleContinue}
-                  >
-                    CONTINUE →
-                  </Button>
-
-                  <p className="mt-4 text-xs text-gray-500">
-                    By clicking the "Continue" button, you are joining adiClub,
-                    will receive emails with the latest news and updates, and
-                    agree to the TERMS OF USE and ADICLUB TERMS AND CONDITIONS
-                    and acknowledge you have read the ADIDAS PRIVACY POLICY.
-                  </p>
+                    <Input
+                      type={showPassword ? "password" : "text"}
+                      placeholder="Password *"
+                      {...register("loginPassword", { required: true })}
+                    />
+                  </div>
+                )}
+                <Button
+                  className="w-1/3 py-3 font-bold text-white bg-black hover:text-gray-300"
+                  onClick={handleContinue}
+                >
+                  CONTINUE →
+                </Button>
+                <div className="font-light text-gray-400 text-xs">
+                  By clicking the “Continue” button, you are joining adiClub,
+                  will receive emails with the latest news and updates, and
+                  agree to the TERMS OF USE and ADICLUB TERMS AND CONDITIONS and
+                  acknowledge you have read the ADIDAS PRIVACY POLICY. If you
+                  are a California resident, the adiClub membership may be
+                  considered a financial incentive. Please see the Financial
+                  Incentives section of our CALIFORNIA PRIVACY NOTICE for
+                  details.
                 </div>
               </DialogContent>
             </Dialog>
           )}
 
           <ViewCartButton />
-
-          {/* Mobile search button */}
-          <button
-            className="p-1.5 rounded-full hover:bg-gray-100 sm:hidden"
-            onClick={toggleMobileSearch}
-            aria-label="Search"
-          >
-            <Icons name="search" />
-          </button>
         </div>
       </div>
-
-      {/* Mobile navigation */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-b">
-          <Navbar />
-        </div>
-      )}
-
-      {/* Mobile search */}
-      {mobileSearchOpen && (
-        <div className="sm:hidden p-3 border-b">
-          <div className="flex gap-2">
-            <SearchInput />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10"
-              onClick={toggleMobileSearch}
-            >
-              <X size={18} />
-            </Button>
-          </div>
-        </div>
-      )}
-
       <QuizDrawer />
     </header>
   );
