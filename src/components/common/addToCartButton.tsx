@@ -4,21 +4,17 @@ import { Button } from "@/components/ui/button";
 import Icon from "./icon";
 import { IProduct } from "@/typings/product";
 import { CART_STORAGE_KEY } from "@/constants/storageKey";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 interface AddToCartButtonProps {
   product: IProduct;
 }
 
-export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
-  product,
-}) => {
+export const AddToCartButton: React.FC<AddToCartButtonProps> = ({ product }) => {
   const handleAddToCart = () => {
     const cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
 
-    const existingIndex = cart.findIndex(
-      (item: { product: string }) => item.product === product._id
-    );
+    const existingIndex = cart.findIndex((item: { product: string }) => item.product === product._id);
 
     if (existingIndex !== -1) {
       cart[existingIndex].quantity += 1;
