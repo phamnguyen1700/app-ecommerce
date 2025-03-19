@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductByIdThunk, getAllProductThunk } from "@/redux/thunks/Product";
@@ -34,23 +34,21 @@ export default function ProductDetailPage() {
   const [recentlyViewed, setRecentlyViewed] = useState<RecentlyViewedProduct[]>([]);
   const [recommendedProducts, setRecommendedProducts] = useState<IProduct[]>([]);
   const dispatch = useDispatch<AppDispatch>();
-  const { user, token } = useAuth();
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState<string>("");
-  const [editingFeedback, setEditingFeedback] = useState<IFeedback | null>(null);
-  const feedbacks = useSelector((state: RootState) => state.feedback.feedbacks || []);
+ const { user, token } = useAuth();
+const [feedbackState, setFeedbackState] = useState({
+  rating: 0,
+  comment: "",
+  editingFeedback: null as IFeedback | null,
+});
+const feedbacks = useSelector((state: RootState) => state.feedback.feedbacks || []);
 
 
 
-  const getProductAPI = async (id: string) => {
+  const getProductAPI = useCallback(async (id: string) => {
     try {
       const res = await dispatch(getProductByIdThunk(id)).unwrap();
       console.log('Product data:', res);
-      setProduct(res);
-      
-      // Get feedbacks
-      const feedbackRes = await dispatch(getFeedbacksByProductThunk(id)).unwrap();
-      console.log('Feedback data:', feedbackRes);
+      setProduct(res); // ✅ Chỉ cập nhật khi có dữ liệu mới
       
       // Add to recently viewed
       const recentlyViewedCookie = getCookie('recentlyViewed');
@@ -89,8 +87,34 @@ export default function ProductDetailPage() {
     } catch (err) {
       console.log(err);
     }
-  };
-
+  },[dispatch]);
+  const getFeedbackApi = useCallback(async (id: string) => {
+    try {
+      const feedbackRes = await dispatch(getFeedbacksByProductThunk(id)).unwrap();
+      console.log('Feedback data:', feedbackRes);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [dispatch]); // ✅ Chỉ thay đổi khi `dispatch` thay đổi
+  const getRecommendedProductApi = useCallback(async () => {
+    try {
+      const allProductsRes = await dispatch(getAllProductThunk()).unwrap();
+      console.log('All products:', allProductsRes);
+  
+      if (!product) return; // ✅ Tránh lỗi nếu `product` chưa có dữ liệu
+      
+      // ✅ Sử dụng `product` từ state thay vì `res`
+      const filtered = allProductsRes.filter((p: IProduct) => 
+        p._id !== product._id && 
+        p.category === product.category
+      );
+  
+      setRecommendedProducts(filtered.slice(0, 4));
+    } catch (err) {
+      console.log(err);
+    }
+  }, [dispatch, product]); // ✅ Thêm `product` vào dependencies để tránh lỗi dữ liệu cũ
+  
   const handleSubmitFeedback = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) {
@@ -98,31 +122,29 @@ export default function ProductDetailPage() {
       return;
     }
 
-    if (rating === 0) {
+    if (feedbackState.rating === 0) {
       toast.error("Vui lòng chọn số sao đánh giá");
       return;
     }
+    
 
     try {
-      if (editingFeedback) {
+      if (feedbackState.editingFeedback) {
         await dispatch(updateFeedbackThunk({
-          id: editingFeedback.id,
-          data: { rating, comment }
+          id: feedbackState.editingFeedback.id,
+          data: { rating: feedbackState.rating, comment: feedbackState.comment }
         })).unwrap();
-        toast.success("Đã cập nhật đánh giá thành công");
       } else {
         await dispatch(createFeedbackThunk({
           productId: productId as string,
-          rating,
-          comment
+          rating: feedbackState.rating,
+          comment: feedbackState.comment
         })).unwrap();
         toast.success("Đã gửi đánh giá thành công");
       }
 
-      // Reset form
-      setRating(0);
-      setComment("");
-      setEditingFeedback(null);
+      setFeedbackState({ rating: 0, comment: "", editingFeedback: null });
+
       
       // Refresh feedbacks
       dispatch(getFeedbacksByProductThunk(productId as string));
@@ -132,10 +154,13 @@ export default function ProductDetailPage() {
   };
 
   const handleEditFeedback = (feedback: IFeedback) => {
-    setEditingFeedback(feedback);
-    setRating(feedback.rating);
-    setComment(feedback.comment || "");
+    setFeedbackState({
+      rating: feedback.rating,
+      comment: feedback.comment || "",
+      editingFeedback: feedback,
+    });
   };
+  
 
   const handleDeleteFeedback = async (feedback: IFeedback) => {
     if (!token) return;
@@ -148,13 +173,18 @@ export default function ProductDetailPage() {
       toast.error("Có lỗi xảy ra khi xóa đánh giá");
     }
   };
-
   useEffect(() => {
     if (productId) {
       getProductAPI(productId);
-      dispatch(getFeedbacksByProductThunk(productId));
     }
-  }, [productId, dispatch, getProductAPI]);
+  }, [productId]); // ✅ Chỉ chạy khi `productId` thay đổi
+  useEffect(() => {
+    if (product) { 
+      getFeedbackApi(product._id); 
+      getRecommendedProductApi();
+    }
+  }, [product]); // ✅ Chỉ chạy khi `product` đã được cập nhật
+  
 
   if (!product) {
     return (
@@ -280,7 +310,7 @@ export default function ProductDetailPage() {
           {/* Review Form */}
           <form onSubmit={handleSubmitFeedback} className="mb-8 bg-gray-50 p-6 rounded-lg">
             <h3 className="font-semibold mb-4">
-              {editingFeedback ? "Chỉnh sửa đánh giá" : "Viết đánh giá"}
+              {feedbackState.editingFeedback ? "Chỉnh sửa đánh giá" : "Viết đánh giá"}
             </h3>
             
             <div className="mb-4">
@@ -290,13 +320,14 @@ export default function ProductDetailPage() {
                   <button
                     key={star}
                     type="button"
-                    onClick={() => setRating(star)}
+                    onClick={() => setFeedbackState((prev) => ({ ...prev, rating: star }))}
+
                     className="focus:outline-none"
                   >
                     <Star
                       className={clsx(
                         "w-6 h-6",
-                        star <= rating ? "text-yellow-400 fill-current" : "text-gray-300"
+                        star <= feedbackState.rating ? "text-yellow-400 fill-current" : "text-gray-300"
                       )}
                     />
                   </button>
@@ -307,8 +338,9 @@ export default function ProductDetailPage() {
             <div className="mb-4">
               <label className="block text-sm font-medium mb-2">Nhận xét</label>
               <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                value={feedbackState.comment}
+                onChange={(e) => setFeedbackState((prev) => ({ ...prev, comment: e.target.value }))}
+                
                 className="w-full p-2 border rounded-md"
                 rows={4}
                 placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."
@@ -320,16 +352,14 @@ export default function ProductDetailPage() {
                 type="submit"
                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
               >
-                {editingFeedback ? "Cập nhật" : "Gửi đánh giá"}
+                {feedbackState.editingFeedback ? "Cập nhật" : "Gửi đánh giá"}
+
               </button>
-              {editingFeedback && (
+              {feedbackState.editingFeedback && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setEditingFeedback(null);
-                    setRating(0);
-                    setComment("");
-                  }}
+                  onClick={() => setFeedbackState({ rating: 0, comment: "", editingFeedback: null })}
+
                   className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
                 >
                   Hủy
