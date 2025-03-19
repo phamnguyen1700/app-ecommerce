@@ -106,7 +106,7 @@ export default function ProductsPage() {
           "The 3-Stripes have appeared on medal stands all around the world, but they've also had an influence that extends far beyond the field of play...",
           "adidas Originals apparel is a stylish complement to our lifestyle shoes. Our streetwear collections pull from the archives to put a modern spin on classics...",
         ]}
-        logo="/logo-adidas.png"
+        
       />
     </div>
   );
