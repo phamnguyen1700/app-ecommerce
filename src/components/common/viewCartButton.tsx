@@ -15,8 +15,8 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { IOrder } from "@/typings/order/order";
 import { createOrderThunk } from "@/redux/thunks/Order";
-import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface CartItem {
   product: string;

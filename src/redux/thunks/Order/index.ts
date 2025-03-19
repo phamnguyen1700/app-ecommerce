@@ -1,7 +1,15 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { cancelOrderService, checkoutOrderService, createOrderService, getOrderAdminService, getOrdersService, updateOrderStatusService, updatePaidStatusService } from "@/redux/services/Order";
+import {
+  cancelOrderService,
+  checkoutOrderService,
+  createOrderService,
+  getOrderAdminService,
+  getOrdersService,
+  updateOrderStatusService,
+  updatePaidStatusService,
+} from "@/redux/services/Order";
 import { IOrder, IOrderState, IOrderStatus } from "@/typings/order/order";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export const createOrderThunk = createAsyncThunk(
   "orders/createOrder",
@@ -22,7 +30,7 @@ export const getOrdersThunk = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const data = await getOrdersService();
-      console.log("orders:", data)
+      console.log("orders:", data);
       return data;
     } catch (err) {
       toast.error("Lấy danh sách đơn hàng không thành công!");
@@ -36,7 +44,7 @@ export const checkoutOrderThunk = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       const data = await checkoutOrderService(id);
-      console.log("clientSercret", data)
+      console.log("clientSercret", data);
       return data;
     } catch (err) {
       toast.error("Thanh toán không thành công!");
@@ -47,7 +55,10 @@ export const checkoutOrderThunk = createAsyncThunk(
 
 export const updatePaidStatusThunk = createAsyncThunk(
   "orders/updatePaidStatus",
-  async ({ orderId, paymentIntentId }: { orderId: string; paymentIntentId: string }, { rejectWithValue }) => {
+  async (
+    { orderId, paymentIntentId }: { orderId: string; paymentIntentId: string },
+    { rejectWithValue }
+  ) => {
     try {
       console.log("orderId:", orderId);
       console.log("paymentIntentId:", paymentIntentId);
@@ -68,18 +79,21 @@ export const getOrderAdminThunk = createAsyncThunk(
   async (params: IOrderState, { rejectWithValue }) => {
     try {
       const data = await getOrderAdminService(params);
-      console.log("orders:", data)
+      console.log("orders:", data);
       return data;
     } catch (err) {
       toast.error("Lấy danh sách đơn hàng không thành công!");
       return rejectWithValue(err);
     }
   }
-)
+);
 
 export const updateOrderStatusThunk = createAsyncThunk(
   "orders/updateOrderStatus",
-  async ({ id, orderStatus }: { id: string; orderStatus: IOrderStatus }, { rejectWithValue }) => {
+  async (
+    { id, orderStatus }: { id: string; orderStatus: IOrderStatus },
+    { rejectWithValue }
+  ) => {
     try {
       const data = await updateOrderStatusService(id, orderStatus);
       toast.success("Cập nhật trạng thái đơn hàng thành công!");
@@ -89,8 +103,8 @@ export const updateOrderStatusThunk = createAsyncThunk(
       toast.error("Cập nhật trạng thái đơn hàng không thành công!");
       return rejectWithValue(err);
     }
-  } 
-)
+  }
+);
 
 export const cancelOrderThunk = createAsyncThunk(
   "orders/cancelOrder",
@@ -105,4 +119,4 @@ export const cancelOrderThunk = createAsyncThunk(
       return rejectWithValue(err);
     }
   }
-)
+);
