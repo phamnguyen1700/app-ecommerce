@@ -5,12 +5,14 @@ import Icon from "./icon";
 import { IProduct } from "@/typings/product";
 import { CART_STORAGE_KEY } from "@/constants/storageKey";
 import { toast } from "react-toastify";
+import { cn } from "@/lib/utils";
 
 interface AddToCartButtonProps {
   product: IProduct;
+  variant?: 'card' | 'detail';
 }
 
-export const AddToCartButton: React.FC<AddToCartButtonProps> = ({ product }) => {
+export const AddToCartButton: React.FC<AddToCartButtonProps> = ({ product, variant = 'card' }) => {
   const handleAddToCart = () => {
     const cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
 
@@ -37,9 +39,14 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({ product }) => 
   return (
     <Button
       onClick={handleAddToCart}
-      className="flex items-center gap-2 bg-white text-black hover:border-2 hover:border-black hover:bg-white transition"
+      className={cn(
+        "flex items-center gap-2 transition",
+        variant === 'card' && "bg-white text-black hover:border-2 hover:border-black hover:bg-white",
+        variant === 'detail' && "w-full bg-black text-white py-6 rounded-md hover:bg-gray-800 justify-center text-base font-medium"
+      )}
     >
       <Icon name="shoppingBasket" className="w-5 h-5" />
+      {variant === 'detail' && "Add to Cart"}
     </Button>
   );
 };

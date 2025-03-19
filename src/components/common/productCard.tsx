@@ -3,15 +3,24 @@ import Icon from "@/components/common/icon";
 import { IProductCardProps } from "@/typings/product";
 import Image from "next/image";
 import { AddToCartButton } from "./addToCartButton";
+import { useRouter } from "next/navigation";
 
 export default function ProductCard({ product }: IProductCardProps) {
+  const router = useRouter();
   const productImage =
     product.images?.[0] && product.images[0].trim() !== ""
       ? product.images[0]
       : "/assets/pictures/image.png";
 
+  const handleCardClick = () => {
+    router.push(`/commercial/detail/${product._id}`);
+  };
+
   return (
-    <Card className="w-full max-w-xs border border-gray-200 rounded-lg shadow-md overflow-hidden hover:border-black hover:border-2">
+    <Card 
+      className="w-full max-w-xs border border-gray-200 rounded-lg shadow-md overflow-hidden hover:border-black hover:border-2 cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="relative w-full h-64">
         <Image
           src={productImage}
@@ -21,7 +30,12 @@ export default function ProductCard({ product }: IProductCardProps) {
           sizes="100%"
         />
 
-        <button className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:bg-gray-200 transition">
+        <button 
+          className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:bg-gray-200 transition"
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent card click when clicking heart
+          }}
+        >
           <Icon name="heart" className="w-5 h-5 text-gray-700" />
         </button>
       </div>
@@ -37,7 +51,9 @@ export default function ProductCard({ product }: IProductCardProps) {
 
         <div className="flex justify-between items-center mt-3">
           <p className="text-sm font-semibold">${product.price.toFixed(2)}</p>
-          <AddToCartButton product={product} />
+          <div onClick={(e) => e.stopPropagation()}>
+            <AddToCartButton product={product} />
+          </div>
         </div>
       </CardContent>
     </Card>
