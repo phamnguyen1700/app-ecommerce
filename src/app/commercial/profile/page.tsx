@@ -28,9 +28,6 @@ export default function ProfilePage() {
     address: {
       street: "",
       city: "",
-      state: "",
-      zipCode: "",
-      country: "",
     },
   });
 
@@ -139,9 +136,6 @@ export default function ProfilePage() {
         address: {
           street: userData.address?.street || "",
           city: userData.address?.city || "",
-          state: "", // Đổi "state" thành "province"
-          zipCode: "", // Không có zipCode trong dữ liệu gốc
-          country: "", // Không có country trong dữ liệu gốc
         },
       });
     }
@@ -256,59 +250,6 @@ export default function ProfilePage() {
                               address: {
                                 ...formData.address,
                                 city: e.target.value,
-                              },
-                            })
-                          }
-                          disabled={!isEditing}
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="state">State</Label>
-                        <Input
-                          id="state"
-                          value={formData.address.state}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              address: {
-                                ...formData.address,
-                                state: e.target.value,
-                              },
-                            })
-                          }
-                          disabled={!isEditing}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="zipCode">ZIP Code</Label>
-                        <Input
-                          id="zipCode"
-                          value={formData.address.zipCode}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              address: {
-                                ...formData.address,
-                                zipCode: e.target.value,
-                              },
-                            })
-                          }
-                          disabled={!isEditing}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="country">Country</Label>
-                        <Input
-                          id="country"
-                          value={formData.address.country}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              address: {
-                                ...formData.address,
-                                country: e.target.value,
                               },
                             })
                           }
