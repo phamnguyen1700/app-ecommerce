@@ -32,11 +32,32 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
     const accessToken = localStorage.getItem("accessToken");
-    setUserData(user);
     setToken(accessToken);
-  }, []);
+
+    if (!accessToken) return; // 🔥 Đảm bảo chỉ fetch khi có token
+    const fetchUserData = async () => {
+      if (!token) return;
+      try {
+        const response = await API.get("/user/profile");
+        setUserData(response.data);
+        setFormData({
+          name: response.data.name,
+          email: response.data.email,
+          skinType: response.data.skinType || "",
+          address: response.data.address || {
+            street: "",
+            city: "",
+          },
+        });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        toast.error("Failed to load profile data");
+      }
+    };
+
+    fetchUserData();
+  }, [token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
