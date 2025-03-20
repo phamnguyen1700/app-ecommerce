@@ -12,8 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "react-toastify";
 
 export default function ProfilePage() {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const token = localStorage.getItem("accessToken");
+  const [token, setToken] = useState<string | null>(null);
   const [userData, setUserData] = useState<IUser | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -36,31 +35,11 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (!token) return;
-      try {
-        const response = await API.get("/user/profile");
-        setUserData(response.data);
-        setFormData({
-          name: response.data.name,
-          email: response.data.email,
-          skinType: response.data.skinType || "",
-          address: response.data.address || {
-            street: "",
-            city: "",
-            state: "",
-            zipCode: "",
-            country: "",
-          },
-        });
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        toast.error("Failed to load profile data");
-      }
-    };
-
-    fetchUserData();
-  }, [token]);
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const accessToken = localStorage.getItem("accessToken");
+    setUserData(user);
+    setToken(accessToken);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +62,7 @@ export default function ProfilePage() {
       toast.error("Bạn chưa đăng nhập!");
       return;
     }
-  
+
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       toast.error("Mật khẩu mới không khớp!");
       return;
@@ -93,12 +72,12 @@ export default function ProfilePage() {
       toast.error("Mật khẩu mới không được trùng với mật khẩu cũ!");
       return;
     }
-  
+
     console.log("🔍 Gửi yêu cầu đổi mật khẩu với:", {
       oldPassword: passwordForm.oldPassword,
       newPassword: passwordForm.newPassword,
     });
-  
+
     try {
       const response = await API.put(
         "/user/change-password",
@@ -112,22 +91,21 @@ export default function ProfilePage() {
           },
         }
       );
-  
+
       console.log("✅ Đổi mật khẩu thành công:", response.data);
       toast.success("Đổi mật khẩu thành công!");
-  
+
       setIsChangingPassword(false);
       setPasswordForm({
         oldPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
-  
-    } catch (error: unknown) { 
+    } catch (error: unknown) {
       if (error instanceof Error) {
         console.error("❌ Lỗi khi đổi mật khẩu:", error.message);
       }
-    
+
       if (typeof error === "object" && error !== null && "response" in error) {
         type ErrorResponse = {
           response: {
@@ -136,30 +114,47 @@ export default function ProfilePage() {
             headers?: Record<string, string>;
           };
         };
-    
+
         const errResponse = error as ErrorResponse;
-    
+
         console.log("🔴 Response data:", errResponse.response.data);
         console.log("🔴 Response status:", errResponse.response.status);
         console.log("🔴 Response headers:", errResponse.response.headers);
-    
-        toast.error(errResponse.response?.data?.message || "Lỗi máy chủ, thử lại sau.");
+
+        toast.error(
+          errResponse.response?.data?.message || "Lỗi máy chủ, thử lại sau."
+        );
       } else {
         toast.error("Đã xảy ra lỗi không xác định!");
       }
     }
-    
-    
   };
-  
-  
 
-  if (!user || !userData) {
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        name: userData.name || "",
+        email: userData.email || "",
+        skinType: userData.skinType || "",
+        address: {
+          street: userData.address?.street || "",
+          city: userData.address?.city || "",
+          state: "", // Đổi "state" thành "province"
+          zipCode: "", // Không có zipCode trong dữ liệu gốc
+          country: "", // Không có country trong dữ liệu gốc
+        },
+      });
+    }
+  }, [userData]);
+
+  if (!userData) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Please log in to view your profile</h1>
-          <Button onClick={() => window.location.href = "/commercial/login"}>
+          <h1 className="text-2xl font-bold mb-4">
+            Please log in to view your profile
+          </h1>
+          <Button onClick={() => (window.location.href = "/commercial/login")}>
             Login
           </Button>
         </div>
@@ -241,7 +236,10 @@ export default function ProfilePage() {
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              address: { ...formData.address, street: e.target.value },
+                              address: {
+                                ...formData.address,
+                                street: e.target.value,
+                              },
                             })
                           }
                           disabled={!isEditing}
@@ -255,7 +253,10 @@ export default function ProfilePage() {
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              address: { ...formData.address, city: e.target.value },
+                              address: {
+                                ...formData.address,
+                                city: e.target.value,
+                              },
                             })
                           }
                           disabled={!isEditing}
@@ -271,7 +272,10 @@ export default function ProfilePage() {
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              address: { ...formData.address, state: e.target.value },
+                              address: {
+                                ...formData.address,
+                                state: e.target.value,
+                              },
                             })
                           }
                           disabled={!isEditing}
@@ -285,7 +289,10 @@ export default function ProfilePage() {
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              address: { ...formData.address, zipCode: e.target.value },
+                              address: {
+                                ...formData.address,
+                                zipCode: e.target.value,
+                              },
                             })
                           }
                           disabled={!isEditing}
@@ -299,7 +306,10 @@ export default function ProfilePage() {
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              address: { ...formData.address, country: e.target.value },
+                              address: {
+                                ...formData.address,
+                                country: e.target.value,
+                              },
                             })
                           }
                           disabled={!isEditing}
@@ -370,7 +380,9 @@ export default function ProfilePage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                        <Label htmlFor="confirmPassword">
+                          Confirm New Password
+                        </Label>
                         <Input
                           id="confirmPassword"
                           type="password"

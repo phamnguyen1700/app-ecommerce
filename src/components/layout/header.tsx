@@ -156,6 +156,7 @@ export default function Header() {
                   <Button
                     variant="link"
                     className="hover:bg-black hover:text-white"
+                    onClick={() => router.push("/commercial/profile")}
                   >
                     <b className="text-sm">VISIT YOUR ACCOUNT →</b>
                   </Button>
