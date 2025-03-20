@@ -18,10 +18,12 @@ import PriceSlider from "@/components/common/priceSlider";
 import { Button } from "@/components/ui/button";
 import { getBrandThunk } from "@/redux/thunks/Brand";
 import { IBrand } from "@/typings/brand";
+import CompareDialog from "@/components/common/compareDialog";
 
 export default function ProductsPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [products, setProducts] = useState<IProduct[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<IProduct | undefined>(undefined);
   const [brands, setBrands] = useState<IBrand[]>([]); // Lưu danh sách brand
 
   const [filterParams, setFilterParams] = useState({
@@ -85,6 +87,11 @@ export default function ProductsPage() {
     getProductAPI();
     getbrandAPI();
   }, [dispatch, getProductAPI, getbrandAPI]);
+
+  // Gửi sản phẩm vào CompareDialog
+  const handleCompare = (product: IProduct) => {
+    setSelectedProduct(product);
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -159,9 +166,14 @@ export default function ProductsPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products?.map((product) => (
-          <ProductCard key={product._id} product={product} />
+          <ProductCard
+            key={product._id}
+            product={product}
+            onCompare={handleCompare}
+          />
         ))}
       </div>
+      <CompareDialog product={selectedProduct} onReset={() => setSelectedProduct(undefined)}/>
     </div>
   );
 }
