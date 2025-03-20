@@ -13,6 +13,8 @@ import {
   Heart,
   ShoppingBasket,
   Trash,
+  Diff,
+  X,
 } from "lucide-react";
 
 const icons = {
@@ -29,6 +31,8 @@ const icons = {
   heart: Heart,
   shoppingBasket: ShoppingBasket,
   trash: Trash,
+  compare: Diff,
+  x: X,
 };
 
 interface IconProps extends LucideProps {

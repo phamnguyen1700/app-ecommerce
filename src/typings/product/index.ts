@@ -22,6 +22,7 @@ export interface IProduct {
 
 export interface IProductCardProps {
   product: IProduct;
+  onCompare?: (product: IProduct) => void; 
 }
 
 export interface IProductFilter {
