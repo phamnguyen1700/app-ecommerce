@@ -15,7 +15,6 @@ import clsx from "clsx";
 import { getCookie, setCookie } from "cookies-next";
 import { AddToCartButton } from "@/components/common/addToCartButton";
 import { IProduct } from "@/typings/product";
-import { useAuth } from "@/redux/reducers/Auth/useAuth";
 import {
   getFeedbacksByProductThunk,
   createFeedbackThunk,
@@ -120,6 +119,7 @@ export default function ProductDetailPage() {
     },
     [dispatch]
   ); // ✅ Chỉ thay đổi khi `dispatch` thay đổi
+  
   const getRecommendedProductApi = useCallback(async () => {
     try {
       const allProductsRes = await dispatch(getAllProductThunk()).unwrap();
@@ -156,7 +156,7 @@ export default function ProductDetailPage() {
       if (feedbackState.editingFeedback) {
         await dispatch(
           updateFeedbackThunk({
-            id: feedbackState.editingFeedback.id,
+            id: feedbackState.editingFeedback._id,
             data: {
               rating: feedbackState.rating,
               comment: feedbackState.comment,
@@ -195,7 +195,7 @@ export default function ProductDetailPage() {
     if (!token) return;
 
     try {
-      await dispatch(deleteFeedbackThunk(feedback.id)).unwrap();
+      await dispatch(deleteFeedbackThunk(feedback._id)).unwrap();
       toast.success("Đã xóa đánh giá thành công");
       dispatch(getFeedbacksByProductThunk(productId as string));
     } catch {
@@ -206,13 +206,13 @@ export default function ProductDetailPage() {
     if (productId) {
       getProductAPI(productId);
     }
-  }, [productId]); // ✅ Chỉ chạy khi `productId` thay đổi
+  }, [productId, getProductAPI]); // ✅ Chỉ chạy khi `productId` thay đổi
   useEffect(() => {
     if (product) {
       getFeedbackApi(product._id);
       getRecommendedProductApi();
     }
-  }, [product]); // ✅ Chỉ chạy khi `product` đã được cập nhật
+  }, [product,getFeedbackApi, getRecommendedProductApi]); // ✅ Chỉ chạy khi `product` đã được cập nhật
 
   if (!product) {
     return (
@@ -419,65 +419,68 @@ export default function ProductDetailPage() {
           </form>
 
           {/* Reviews List */}
-          <div className="space-y-6">
-            {Array.isArray(feedbacks) && feedbacks.length > 0 ? (
-              feedbacks.map((feedback, index) => (
-                <div
-                  key={feedback.id || `feedback-${index}`}
-                  className="bg-white p-6 rounded-lg shadow-sm"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">
-                          {feedback.userId ? feedback.userId.name : "Ẩn danh"}
-                        </span>
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={clsx(
-                                "w-4 h-4",
-                                i < feedback.rating
-                                  ? "text-yellow-400 fill-current"
-                                  : "text-gray-300"
-                              )}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-gray-600 mt-2">{feedback.comment}</p>
-                      <span className="text-sm text-gray-500 mt-1 block">
-                        {new Date(feedback.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
+          <div className="mt-16">
+  <h2 className="text-2xl font-bold mb-6">Reviews</h2>
 
-                    {user && feedback.userId?.id === user.id && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEditFeedback(feedback)}
-                          className="p-1 hover:bg-gray-100 rounded"
-                        >
-                          <Edit2 className="w-4 h-4 text-blue-500" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteFeedback(feedback)}
-                          className="p-1 hover:bg-gray-100 rounded"
-                        >
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </button>
-                      </div>
-                    )}
+  <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
+    <div className="flex gap-4">
+      {Array.isArray(feedbacks) && feedbacks.length > 0 ? (
+        feedbacks.map((feedback, index) => (
+          <div
+            key={feedback._id || `feedback-${index}`}
+            className="bg-white p-6 rounded-lg shadow-sm flex-shrink-0 w-80"
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">
+                    {feedback.userId ? feedback.userId.name : "Ẩn danh"}
+                  </span>
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={clsx(
+                          "w-4 h-4",
+                          i < feedback.rating
+                            ? "text-yellow-400 fill-current"
+                            : "text-gray-300"
+                        )}
+                      />
+                    ))}
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="text-center text-gray-500 py-8">
-                Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá sản phẩm
-                này!
+                <p className="text-gray-600 mt-2">{feedback.comment}</p>
+                <span className="text-sm text-gray-500 mt-1 block">
+                  {new Date(feedback.createdAt).toLocaleDateString()}
+                </span>
               </div>
-            )}
+
+              {console.log("Feedback userId:", feedback.userId)}
+              {console.log("Current user ID:", user?.id)}
+
+              {user && (feedback.userId?._id === user.id) && (
+                <div className="flex gap-2">
+                  <button onClick={() => handleEditFeedback(feedback)} className="p-1 hover:bg-gray-100 rounded">
+                    <Edit2 className="w-4 h-4 text-blue-500" />
+                  </button>
+                  <button onClick={() => handleDeleteFeedback(feedback)} className="p-1 hover:bg-gray-100 rounded">
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
+        ))
+      ) : (
+        <div className="text-center text-gray-500 py-8">
+          Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá sản phẩm này!
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
         </div>
 
         {/* Recently Viewed Products */}

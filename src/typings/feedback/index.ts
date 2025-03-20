@@ -1,10 +1,10 @@
-import { IUser } from "../auth"; // Đường dẫn phù hợp với dự án của bạn
+
 
 export interface IFeedback {
-  id: string;
+  _id: string;
   productId: string;
   userId: {
-    id: string;
+    _id: string;
     name: string;
     email: string;
   }; // Định nghĩa riêng vì API trả về `userId`

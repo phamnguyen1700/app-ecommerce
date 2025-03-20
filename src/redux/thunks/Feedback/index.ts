@@ -5,7 +5,7 @@ import { feedbackService } from"../../services/Feedback";
 export const getFeedbacksByProductThunk = createAsyncThunk<IFeedback[], string>(
   "feedback/getByProduct",
  
-  async (productId, { rejectWithValue }) => { // eslint-disable-line
+  async (productId, { rejectWithValue }) => { 
     try {
         const data = await feedbackService.getFeedbacksByProduct(productId);
         console.log("feedback data:",data);

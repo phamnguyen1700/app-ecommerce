@@ -5,7 +5,7 @@ import axios from 'axios';
 
 export const getAllProductThunk = createAsyncThunk(
     "products/fetchProducts",
-    async (_, { rejectWithValue }) => { // eslint-disable-line
+    async (_, { rejectWithValue }) => { 
         try {
             const data = await getAllProductService();
             console.log(data);

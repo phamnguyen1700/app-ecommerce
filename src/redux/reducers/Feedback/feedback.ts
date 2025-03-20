@@ -61,7 +61,7 @@ const feedbackSlice = createSlice({
     });
     builder.addCase(updateFeedbackThunk.fulfilled, (state, action) => {
       state.loading = false;
-      const index = state.feedbacks.findIndex((f) => f.id === action.payload.id);
+      const index = state.feedbacks.findIndex((f) => f._id === action.payload._id);
       if (index !== -1) {
         state.feedbacks[index] = action.payload;
       }
@@ -79,7 +79,7 @@ const feedbackSlice = createSlice({
     builder.addCase(deleteFeedbackThunk.fulfilled, (state, action) => {
       state.loading = false;
       state.feedbacks = state.feedbacks.filter(
-        (f) => f.id !== action.meta.arg
+        (f) => f._id !== action.meta.arg
       );
     });
     builder.addCase(deleteFeedbackThunk.rejected, (state, action) => {
