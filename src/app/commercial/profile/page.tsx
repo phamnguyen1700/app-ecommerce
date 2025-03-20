@@ -18,7 +18,7 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
+    oldPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
@@ -79,30 +79,64 @@ export default function ProfilePage() {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) return;
-
+    if (!token) {
+      toast.error("Bạn chưa đăng nhập!");
+      return;
+    }
+  
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast.error("New passwords do not match");
+      toast.error("Mật khẩu mới không khớp!");
       return;
     }
 
+    if (passwordForm.oldPassword === passwordForm.newPassword) {
+      toast.error("Mật khẩu mới không được trùng với mật khẩu cũ!");
+      return;
+    }
+  
+    console.log("🔍 Gửi yêu cầu đổi mật khẩu với:", {
+      oldPassword: passwordForm.oldPassword,
+      newPassword: passwordForm.newPassword,
+    });
+  
     try {
-      await API.put("/api/user/change-password", {
-        currentPassword: passwordForm.currentPassword,
-        newPassword: passwordForm.newPassword,
-      });
+      const response = await API.put(
+        "/user/change-password",
+        {
+          oldPassword: passwordForm.oldPassword,
+          newPassword: passwordForm.newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      console.log("✅ Đổi mật khẩu thành công:", response.data);
+      toast.success("Đổi mật khẩu thành công!");
+  
       setIsChangingPassword(false);
       setPasswordForm({
-        currentPassword: "",
+        oldPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
-      toast.success("Password changed successfully");
-    } catch (error) {
-      console.error("Error changing password:", error);
-      toast.error("Failed to change password");
+  
+    } catch (error: any) {
+      console.error("❌ Lỗi khi đổi mật khẩu:", error.response ? error.response.data : error.message);
+  
+      if (error.response) {
+        console.log("🔴 Response data:", error.response.data);
+        console.log("🔴 Response status:", error.response.status);
+        console.log("🔴 Response headers:", error.response.headers);
+      }
+  
+      toast.error(error.response?.data?.message || "Lỗi máy chủ, thử lại sau.");
     }
   };
+  
+  
 
   if (!user || !userData) {
     return (
@@ -290,15 +324,15 @@ export default function ProfilePage() {
                   {isChangingPassword ? (
                     <form onSubmit={handleChangePassword} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="currentPassword">Current Password</Label>
+                        <Label htmlFor="oldPassword">Current Password</Label>
                         <Input
-                          id="currentPassword"
+                          id="oldPassword"
                           type="password"
-                          value={passwordForm.currentPassword}
+                          value={passwordForm.oldPassword}
                           onChange={(e) =>
                             setPasswordForm({
                               ...passwordForm,
-                              currentPassword: e.target.value,
+                              oldPassword: e.target.value,
                             })
                           }
                           required
@@ -341,7 +375,7 @@ export default function ProfilePage() {
                           onClick={() => {
                             setIsChangingPassword(false);
                             setPasswordForm({
-                              currentPassword: "",
+                              oldPassword: "",
                               newPassword: "",
                               confirmPassword: "",
                             });
@@ -361,9 +395,6 @@ export default function ProfilePage() {
                       Change Password
                     </Button>
                   )}
-                  <Button variant="destructive" className="w-full">
-                    Delete Account
-                  </Button>
                 </div>
               </CardContent>
             </Card>
