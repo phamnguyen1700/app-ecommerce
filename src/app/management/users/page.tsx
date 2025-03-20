@@ -124,7 +124,7 @@ export default function ManageUserPage() {
       colName: "Địa chỉ",
       render: (record: IUser) =>
         record.address
-          ? `${record.address.street}, ${record.address.city}, ${record.address.province}`
+          ? `${record.address.street}, ${record.address.city}`
           : "N/A",
     },
     {

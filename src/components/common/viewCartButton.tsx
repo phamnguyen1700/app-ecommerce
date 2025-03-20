@@ -97,7 +97,6 @@ export default function ViewCartButton() {
         fullnames: storedUser.address.fullName,
         street: storedUser.address.street,
         city: storedUser.address.city,
-        province: storedUser.address.province,
         phone: storedUser.address.phone,
       },
     };
