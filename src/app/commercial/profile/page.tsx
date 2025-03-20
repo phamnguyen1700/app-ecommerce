@@ -1,9 +1,6 @@
 "use client";
 
 import "@/app/globals.css";
-import { useAuth } from "@/redux/reducers/Auth/useAuth";
-import { AppDispatch } from "@/redux/store";
-import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { IUser } from "@/typings/user";
 import { API } from "@/utils/Api";
@@ -15,11 +12,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "react-hot-toast";
 
 export default function ProfilePage() {
-  const { user} = useAuth();
-  const token = localStorage.getItem("accessToken");
-  const dispatch = useDispatch<AppDispatch>();
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const token = localStorage.getItem("accessToken");
   const [userData, setUserData] = useState<IUser | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -75,6 +77,33 @@ export default function ProfilePage() {
     }
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    try {
+      await API.put("/api/user/change-password", {
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      });
+      setIsChangingPassword(false);
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      toast.success("Password changed successfully");
+    } catch (error) {
+      console.error("Error changing password:", error);
+      toast.error("Failed to change password");
+    }
+  };
+
   if (!user || !userData) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -101,9 +130,8 @@ export default function ProfilePage() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
@@ -252,18 +280,6 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
           </TabsContent>
-
-          <TabsContent value="orders">
-            <Card>
-              <CardHeader>
-                <CardTitle>Order History</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-500">No orders found</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
           <TabsContent value="settings">
             <Card>
               <CardHeader>
@@ -271,9 +287,80 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <Button variant="outline" className="w-full">
-                    Change Password
-                  </Button>
+                  {isChangingPassword ? (
+                    <form onSubmit={handleChangePassword} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="currentPassword">Current Password</Label>
+                        <Input
+                          id="currentPassword"
+                          type="password"
+                          value={passwordForm.currentPassword}
+                          onChange={(e) =>
+                            setPasswordForm({
+                              ...passwordForm,
+                              currentPassword: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="newPassword">New Password</Label>
+                        <Input
+                          id="newPassword"
+                          type="password"
+                          value={passwordForm.newPassword}
+                          onChange={(e) =>
+                            setPasswordForm({
+                              ...passwordForm,
+                              newPassword: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          value={passwordForm.confirmPassword}
+                          onChange={(e) =>
+                            setPasswordForm({
+                              ...passwordForm,
+                              confirmPassword: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="flex justify-end space-x-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            setIsChangingPassword(false);
+                            setPasswordForm({
+                              currentPassword: "",
+                              newPassword: "",
+                              confirmPassword: "",
+                            });
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button type="submit">Change Password</Button>
+                      </div>
+                    </form>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setIsChangingPassword(true)}
+                    >
+                      Change Password
+                    </Button>
+                  )}
                   <Button variant="destructive" className="w-full">
                     Delete Account
                   </Button>
