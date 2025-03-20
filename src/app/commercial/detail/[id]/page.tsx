@@ -339,9 +339,9 @@ export default function ProductDetailPage() {
 
         {/* Reviews Section */}
         <div className="mt-16">
-          <h2 className="text-2xl font-bold mb-6">Reviews</h2>
 
           {/* Review Form */}
+          {user?.role !== "admin" && (
           <form
             onSubmit={handleSubmitFeedback}
             className="mb-8 bg-gray-50 p-6 rounded-lg"
@@ -417,7 +417,7 @@ export default function ProductDetailPage() {
               )}
             </div>
           </form>
-
+          )}
           {/* Reviews List */}
           <div className="mt-16">
   <h2 className="text-2xl font-bold mb-6">Reviews</h2>
@@ -459,7 +459,7 @@ export default function ProductDetailPage() {
               {console.log("Feedback userId:", feedback.userId)}
               {console.log("Current user ID:", user?.id)}
 
-              {user && (feedback.userId?._id === user.id) && (
+              {user && user.role !== "admin" && feedback.userId?._id === user.id && (
                 <div className="flex gap-2">
                   <button onClick={() => handleEditFeedback(feedback)} className="p-1 hover:bg-gray-100 rounded">
                     <Edit2 className="w-4 h-4 text-blue-500" />
