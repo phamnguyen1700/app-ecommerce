@@ -138,7 +138,7 @@ export default function Header() {
   return (
     <header className="w-full sticky top-0 bg-white shadow-md z-[400]">
       <div className="w-full h-7 pt-1.5 font-semibold bg-black text-white text-center text-xs">
-        KHUYẾN MÃI THÊM Ở ĐÂY
+        GIẢM GIÁ ĐẾN 10% CHO KHÁCH HÀNG THÂN THIẾT
       </div>
       <div className="h-3">
         <div className="flex justify-end -space-x-0.5 ">
