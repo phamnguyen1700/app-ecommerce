@@ -95,6 +95,7 @@ export default function ViewCartButton() {
       paymentMethod: "Stripe",
       shippingAddress: {
         fullnames: storedUser.address.fullName,
+        district:storedUser.address.district,
         street: storedUser.address.street,
         city: storedUser.address.city,
         phone: storedUser.address.phone,

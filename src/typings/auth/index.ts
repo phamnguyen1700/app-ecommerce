@@ -2,6 +2,7 @@ export interface IAddress {
     fullnames: string;
     street: string;
     city: string;
+    district:string;
     phone: string;
     _id: string;
   }

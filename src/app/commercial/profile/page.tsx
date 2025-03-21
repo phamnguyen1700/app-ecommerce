@@ -26,6 +26,7 @@ export default function ProfilePage() {
     email: "",
     skinType: "",
     address: {
+      district:"",
       street: "",
       city: "",
     },
@@ -39,17 +40,21 @@ export default function ProfilePage() {
     const fetchUserData = async () => {
       if (!token) return;
       try {
-        const response = await API.get("/user/profile");
+        const response = await API.get("/user/profile",{
+          headers: { Authorization: `Bearer ${accessToken}` },});
+
         setUserData(response.data);
         setFormData({
           name: response.data.name,
           email: response.data.email,
           skinType: response.data.skinType || "",
           address: response.data.address || {
+            district:"",
             street: "",
             city: "",
           },
         });
+        
       } catch (error) {
         console.error("Error fetching user data:", error);
         toast.error("Failed to load profile data");
@@ -115,7 +120,9 @@ export default function ProfilePage() {
 
       console.log("✅ Đổi mật khẩu thành công:", response.data);
       toast.success("Đổi mật khẩu thành công!");
-
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      window.location.reload();
       setIsChangingPassword(false);
       setPasswordForm({
         oldPassword: "",
@@ -158,6 +165,7 @@ export default function ProfilePage() {
         email: userData.email || "",
         skinType: userData.skinType || "",
         address: {
+          district:userData.address?.district||"",
           street: userData.address?.street || "",
           city: userData.address?.city || "",
         },
@@ -165,16 +173,13 @@ export default function ProfilePage() {
     }
   }, [userData]);
 
-  if (!userData) {
+  if (!token || !userData) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">
             Please log in to view your profile
           </h1>
-          <Button onClick={() => (window.location.href = "/commercial/login")}>
-            Login
-          </Button>
         </div>
       </div>
     );
@@ -257,6 +262,23 @@ export default function ProfilePage() {
                               address: {
                                 ...formData.address,
                                 street: e.target.value,
+                              },
+                            })
+                          }
+                          disabled={!isEditing}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="district">District</Label>
+                        <Input
+                          id="district"
+                          value={formData.address.district}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              address: {
+                                ...formData.address,
+                                district: e.target.value,
                               },
                             })
                           }
