@@ -1,11 +1,12 @@
-import { getAllProductService, getProductService } from "@/redux/services/Product";
+import { addProductService, getAllProductService, getProductService } from "@/redux/services/Product";
 import { IProductFilter } from "@/typings/product";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 
 
 export const getAllProductThunk = createAsyncThunk(
     "products/fetchProducts",
-    async (_, { rejectWithValue }) => { // eslint-disable-line
+    async (_, { rejectWithValue }) => { 
         try {
             const data = await getAllProductService();
             console.log(data);
@@ -37,4 +38,18 @@ export const getProductThunk = createAsyncThunk(
   }
 );
 
-  
+export const addProductThunk = createAsyncThunk(
+  "products/addProduct",
+  async (data: FormData) => {
+    try {
+      console.log("📦 Payload gửi lên API:", Object.fromEntries(data.entries())); // Debug dữ liệu
+
+      const response = await addProductService(data);
+      toast.success("Thêm sản phẩm thành công");
+
+      return response; // ✅ Trả về dữ liệu để Redux cập nhật state
+    } catch  {
+      toast.error("Thêm sản phẩm không thành công");      return;
+    }
+  }
+);

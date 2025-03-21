@@ -2,7 +2,7 @@ export interface IAddress {
     fullnames: string;
     street: string;
     city: string;
-    province: string;
+    district: string;
     phone: string;
     _id: string;
   }
@@ -16,3 +16,8 @@ export interface IAddress {
     address: IAddress;
   }
   
+  export interface IReg {
+    name: string;
+    email: string;
+    password: string;
+  }

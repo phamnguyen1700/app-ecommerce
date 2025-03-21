@@ -29,9 +29,11 @@ import {
 import { IBrand } from "@/typings/brand";
 import { getBrandThunk } from "@/redux/thunks/Brand";
 import PriceSlider from "@/components/common/priceSlider";
+import AddProductDialog from "@/components/common/addProductForm";
 
 export default function ManageProductPage() {
   const dispatch = useDispatch<AppDispatch>();
+  const [openAddDialog, setOpenAddDialog] = useState(false);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [brands, setBrands] = useState<IBrand[]>([]); // Lưu danh sách brand
   const [filterParams, setFilterParams] = useState({
@@ -178,7 +180,7 @@ export default function ManageProductPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">Quản lý sản phẩm</h1>
-        <Button>Thêm sản phẩm</Button>
+        <Button onClick={() => setOpenAddDialog(true)}>Thêm sản phẩm</Button>
       </div>
 
       {/*  <ProductFilter  */}
@@ -287,6 +289,10 @@ export default function ManageProductPage() {
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+      <AddProductDialog
+        open={openAddDialog}
+        onClose={() => setOpenAddDialog(false)}
+      />
     </div>
   );
 }

@@ -1,5 +1,6 @@
-import { refreshTokenService } from './../../services/Auth/index';
+import { refreshTokenService, registerService } from './../../services/Auth/index';
 import { loginService } from "@/redux/services/Auth";
+import { IReg } from '@/typings/auth';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
@@ -43,3 +44,19 @@ export const loginThunk = createAsyncThunk(
     localStorage.removeItem("user");
   }
   )
+
+export const registerThunk = createAsyncThunk(
+  "auth/register",
+  async ({ name, email, password }: { name: string; email: string; password: string }) => {
+    const data: IReg = { name, email, password };
+    try {
+      console.log("dữ liệu gửi đi")
+      const response = await registerService(data);
+      toast.success("Đăng ký thành công!");
+
+      return response; // Trả về dữ liệu user để lưu vào Redux store
+    } catch {
+      return toast.error("Đăng ký thất bại!");
+    }
+  }
+);

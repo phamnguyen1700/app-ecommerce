@@ -11,7 +11,6 @@ import {
 } from "../ui/dialog";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
-import GoogleButton from "../common/googleButton";
 import {
   Drawer as SideDrawer,
   DrawerContent,
@@ -20,7 +19,7 @@ import {
 } from "@/components/common/sideDrawer";
 import Icon from "@/components/common/icon";
 import { useDispatch } from "react-redux";
-import { loginThunk, refreshTokenThunk } from "@/redux/thunks/Auth";
+import { loginThunk, refreshTokenThunk, registerThunk } from "@/redux/thunks/Auth";
 import { AppDispatch } from "@/redux/store";
 import Navbar from "@/components/layout/nav/commercialNav";
 import Image from "next/image";
@@ -29,6 +28,8 @@ import ViewCartButton from "../common/viewCartButton";
 import Link from "next/link";
 import QuizDrawer from "../common/quiz";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { IReg } from "@/typings/auth";
 
 export default function Header() {
   const router = useRouter();
@@ -37,7 +38,7 @@ export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
   const [openUser, setOpenUser] = useState(false);
   const [signUp, setSignUp] = useState(false);
-  const { register, setValue, watch, reset } = useForm({
+  const { register, setValue, watch, reset, handleSubmit } = useForm({
     defaultValues: {
       name: "",
       email: "",
@@ -51,13 +52,13 @@ export default function Header() {
 
   useEffect(() => {
     const user = localStorage.getItem("user");
-      if (user) {
-        const parseUser = JSON.parse(user);
-        if (parseUser.role === "admin") {
-          setPermission(true);
-          console.log("Permission granted");
-        }
+    if (user) {
+      const parseUser = JSON.parse(user);
+      if (parseUser.role === "admin") {
+        setPermission(true);
+        console.log("Permission granted");
       }
+    }
 
     if (loggedIn === null) {
       const token = localStorage.getItem("accessToken");
@@ -84,22 +85,47 @@ export default function Header() {
     reset();
   };
 
-  const handleContinue = () => {
-    if (step === "email") {
-      setValue("loginEmail", watch("email"));
-      setStep("password");
-    } else if (step === "password") {
-      console.log("Logging in with:", {
-        email: watch("loginEmail"),
-        password: watch("loginPassword"),
-      });
-      dispatch(
-        loginThunk({
-          email: watch("loginEmail"),
-          password: watch("loginPassword"),
-        })
-      );
-      setOpenUser(false);
+  const handleContinue = async (data: IReg) => {
+    if (signUp) {
+      try {
+         await dispatch(
+          registerThunk({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+          })
+        ).unwrap();
+  
+        toast.success("Đăng ký thành công!");
+        setSignUp(false); // Chuyển về màn hình đăng nhập
+        reset();
+      } catch  {
+        toast.error( "Đăng ký thất bại!");
+      }
+    } else {
+      // Xử lý đăng nhập
+      if (step === "email") {
+        setValue("loginEmail", watch("email"));
+        setStep("password");
+      } else if (step === "password") {
+        try {
+          await dispatch(
+            loginThunk({
+              email: watch("loginEmail"),
+              password: watch("loginPassword"),
+            })
+          ).unwrap();
+  
+          toast.success("Đăng nhập thành công!");
+          setOpenUser(false);
+          reset();
+          setTimeout(() => {
+            window.location.reload(); // Reload trang sau khi đăng nhập thành công
+          }, 1500); // Chờ 1.5 giây để người dùng thấy thông báo trước khi reload
+        } catch  {
+          toast.error( "Đăng nhập thất bại!");
+        }
+      }
     }
   };
 
@@ -111,9 +137,7 @@ export default function Header() {
   };
 
   return (
-<header className="w-full sticky top-0 bg-white shadow-md z-[400]">
-
-
+    <header className="w-full sticky top-0 bg-white shadow-md z-[400]">
       <div className="w-full h-7 pt-1.5 font-semibold bg-black text-white text-center text-xs">
         KHUYẾN MÃI THÊM Ở ĐÂY
       </div>
@@ -277,7 +301,6 @@ export default function Header() {
                       </div>
                     ) : (
                       <div className="flex-col">
-                        <GoogleButton />
                         <Input
                           type="email"
                           placeholder="EMAIL ADDRESS *"
@@ -324,7 +347,7 @@ export default function Header() {
                 )}
                 <Button
                   className="w-1/3 py-3 font-bold text-white bg-black hover:text-gray-300"
-                  onClick={handleContinue}
+                  onClick={handleSubmit(handleContinue)}
                 >
                   CONTINUE →
                 </Button>

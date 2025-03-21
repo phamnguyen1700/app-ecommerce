@@ -65,12 +65,10 @@ export default function ProductsPage() {
 
   const handleProcess = (id: string, orderStatus: IOrderStatus) => {
     dispatch(updateOrderStatusThunk({ id, orderStatus }));
-    window.location.reload();
   };
 
   const handleCancel = (id: string) => {
     dispatch(cancelOrderThunk({ id }));
-    window.location.reload();
   };
 
   const handleShipping = () => {
@@ -135,9 +133,9 @@ export default function ProductsPage() {
             onClick={() => {
               if (order.isPaid) {
                 if (order.orderStatus === "Processing") {
-                  handleProcess(order._id || "", "Processing");
-                } else {
                   handleShipping();
+                } else {
+                  handleProcess(order._id || "", "Processing");
                 }
               } else {
                 handleCancel(order._id || "");
