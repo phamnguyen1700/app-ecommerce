@@ -6,7 +6,6 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Facebook, Instagram, Youtube, Send, CreditCard } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
 
 export default function Footer() {
