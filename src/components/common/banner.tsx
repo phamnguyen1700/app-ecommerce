@@ -3,12 +3,12 @@ import React from "react";
 import { Button } from "../ui/button";
 
 interface BannerProps {
-    title: string;
-    description?: string; // Mô tả có thể không có
-  }
+  title: string;
+  description?: string; // Mô tả có thể không có
+}
 
-  const Banner: React.FC<BannerProps> = ({ title, description }) => {
-    return (
+const Banner: React.FC<BannerProps> = ({ title, description }) => {
+  return (
     <div className="relative w-fit h-auto">
       {/* Hình ảnh nền */}
       <Image

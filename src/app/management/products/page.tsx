@@ -2,10 +2,10 @@
 
 import "@/app/globals.css";
 import CustomTable from "@/components/common/customTable";
-import type { AppDispatch } from "@/redux/store";
+import { AppDispatch } from "@/redux/store";
 import { getProductThunk } from "@/redux/thunks/Product";
-import type { IProduct, IProductFilter } from "@/typings/product";
-import type { TableColumn } from "@/typings/table";
+import { IProduct, IProductFilter } from "@/typings/product";
+import { TableColumn } from "@/typings/table";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { IBrand } from "@/typings/brand";
+import { IBrand } from "@/typings/brand";
 import { getBrandThunk } from "@/redux/thunks/Brand";
 import PriceSlider from "@/components/common/priceSlider";
 import { Filter, Plus, Search, X } from "lucide-react";

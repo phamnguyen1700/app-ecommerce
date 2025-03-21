@@ -27,6 +27,7 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import CompareDialog from "@/components/common/compareDialog";
 
 export default function ProductsPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -34,6 +35,9 @@ export default function ProductsPage() {
   const [brands, setBrands] = useState<IBrand[]>([]); // Lưu danh sách brand
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState(0);
+  const [selectedProduct, setSelectedProduct] = useState<IProduct | undefined>(
+    undefined
+  );
 
   const [filterParams, setFilterParams] = useState({
     category: "",
@@ -118,6 +122,10 @@ export default function ProductsPage() {
     getProductAPI();
     getbrandAPI();
   }, [dispatch, getProductAPI, getbrandAPI]);
+
+  const handleCompare = (product: IProduct) => {
+    setSelectedProduct(product);
+  };
 
   return (
     <div className="container mx-auto p-3 sm:p-4 md:p-6">
@@ -394,7 +402,11 @@ export default function ProductsPage() {
       ) : products.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
           {products.map((product) => (
-            <ProductCard key={product._id} product={product} />
+            <ProductCard
+              key={product._id}
+              product={product}
+              onCompare={handleCompare}
+            />
           ))}
         </div>
       ) : (
@@ -405,6 +417,10 @@ export default function ProductsPage() {
           </Button>
         </div>
       )}
+      <CompareDialog
+        product={selectedProduct}
+        onReset={() => setSelectedProduct(undefined)}
+      />
     </div>
   );
 }

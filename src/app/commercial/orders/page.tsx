@@ -3,14 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import type { IOrder } from "@/typings/order/order";
-import type { AppDispatch } from "@/redux/store";
+import { IOrder } from "@/typings/order/order";
+import { AppDispatch } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { getOrdersThunk } from "@/redux/thunks/Order";
 import { formatDateToDisplay } from "@/utils/formatDateToDisplay";
 import CheckoutButton from "@/components/common/checkoutButton";
 import Image from "next/image";
-import type { IProduct } from "@/typings/product";
+import { IProduct } from "@/typings/product";
 import { getAllProductThunk } from "@/redux/thunks/Product";
 
 export default function OrdersPage() {

@@ -99,15 +99,30 @@ export default function ProductsPage() {
           ))}
         </HomeSlider>
       </div>
+
+      {/* Using the improved IntroBanner */}
       <IntroBanner
-        title="A LEADER IN ATHLETIC PERFORMANCE SINCE 1949"
+        title="CHĂM SÓC DA CHUYÊN NGHIỆP TỪ NĂM 2010"
         description={[
-          "We're inspired by athletes. From the very first track spikes Adi Dassler made in his workshop, creating the best gear for the athlete is what drives us to pursue technological breakthroughs and design innovations.",
-          "The 3-Stripes have appeared on medal stands all around the world, but they've also had an influence that extends far beyond the field of play...",
-          "adidas Originals apparel is a stylish complement to our lifestyle shoes. Our streetwear collections pull from the archives to put a modern spin on classics...",
+          "Chúng tôi lấy cảm hứng từ các chuyên gia da liễu. Từ những công thức đầu tiên được tạo ra trong phòng thí nghiệm, việc tạo ra các sản phẩm chăm sóc da tốt nhất cho mọi loại da là động lực thúc đẩy chúng tôi theo đuổi các đột phá công nghệ và đổi mới thiết kế.",
+          "Các sản phẩm của chúng tôi đã xuất hiện trên các kệ làm đẹp trên khắp thế giới, nhưng chúng cũng có ảnh hưởng vượt xa lĩnh vực chăm sóc da...",
+          "Dòng sản phẩm chăm sóc da tự nhiên của chúng tôi là sự bổ sung hoàn hảo cho các bộ sưu tập cao cấp. Các công thức của chúng tôi kết hợp từ các thành phần truyền thống để tạo nên phong cách hiện đại cho các sản phẩm kinh điển...",
         ]}
-        
+        ctaLink="/commercial/blogs"
+        ctaText="Về chúng tôi"
       />
+
+      {/* Uncomment to use the alternative version
+      <IntroBanner
+        title="CHĂM SÓC DA CHUYÊN NGHIỆP TỪ NĂM 2010"
+        description={[
+          "Chúng tôi lấy cảm hứng từ các chuyên gia da liễu. Từ những công thức đầu tiên được tạo ra trong phòng thí nghiệm, việc tạo ra các sản phẩm chăm sóc da tốt nhất cho mọi loại da là động lực thúc đẩy chúng tôi theo đuổi các đột phá công nghệ và đổi mới thiết kế.",
+          "Các sản phẩm của chúng tôi đã xuất hiện trên các kệ làm đẹp trên khắp thế giới, nhưng chúng cũng có ảnh hưởng vượt xa lĩnh vực chăm sóc da...",
+          "Dòng sản phẩm chăm sóc da tự nhiên của chúng tôi là sự bổ sung hoàn hảo cho các bộ sưu tập cao cấp. Các công thức của chúng tôi kết hợp từ các thành phần truyền thống để tạo nên phong cách hiện đại cho các sản phẩm kinh điển...",
+        ]}
+        backgroundImage="/placeholder.svg?height=1080&width=1920"
+      />
+      */}
     </div>
   );
 }

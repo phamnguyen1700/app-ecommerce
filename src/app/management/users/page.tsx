@@ -4,9 +4,9 @@ import type React from "react";
 
 import "@/app/globals.css";
 import CustomTable from "@/components/common/customTable";
-import type { AppDispatch } from "@/redux/store";
-import type { IUser, IUserFilter } from "@/typings/user";
-import type { TableColumn } from "@/typings/table";
+import { AppDispatch } from "@/redux/store";
+import { IUser, IUserFilter } from "@/typings/user";
+import { TableColumn } from "@/typings/table";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { getAllUserThunk, toggleBanUserThunk } from "@/redux/thunks/User";

@@ -25,7 +25,6 @@ import { useDispatch } from "react-redux";
 import { loginThunk, refreshTokenThunk } from "@/redux/thunks/Auth";
 import type { AppDispatch } from "@/redux/store";
 import Navbar from "@/components/layout/nav/commercialNav";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 import ViewCartButton from "../common/viewCartButton";
 import Link from "next/link";
@@ -199,16 +198,6 @@ export default function Header() {
                   </DrawerClose>
                 </div>
 
-                <div className="flex justify-center py-4 bg-gray-100">
-                  <Image
-                    src="/placeholder.svg?height=120&width=120"
-                    alt="User Avatar"
-                    width={120}
-                    height={120}
-                    className="rounded-full border-2 border-white shadow-md"
-                  />
-                </div>
-
                 <div className="flex flex-col gap-1 p-4">
                   <Button
                     variant="ghost"
@@ -302,7 +291,7 @@ export default function Header() {
                   </h2>
                   <p className="text-gray-500 text-sm mb-6">
                     Get free shipping, discount vouchers and members only
-                    products when you're in adiClub.
+                    products when you are in adiClub.
                   </p>
 
                   {watch("loginEmail") === "" ? (
@@ -315,7 +304,7 @@ export default function Header() {
                         >
                           sign up
                         </button>
-                        <span> - it's free</span>
+                        <span> - free</span>
                       </div>
 
                       {signUp ? (
@@ -385,7 +374,7 @@ export default function Header() {
                   </Button>
 
                   <p className="mt-4 text-xs text-gray-500">
-                    By clicking the "Continue" button, you are joining adiClub,
+                    By clicking the Continue button, you are joining adiClub,
                     will receive emails with the latest news and updates, and
                     agree to the TERMS OF USE and ADICLUB TERMS AND CONDITIONS
                     and acknowledge you have read the ADIDAS PRIVACY POLICY.

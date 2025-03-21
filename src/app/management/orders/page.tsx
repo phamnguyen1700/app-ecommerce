@@ -1,19 +1,19 @@
 "use client";
 
-import type React from "react";
+import React from "react";
 
 import "@/app/globals.css";
 import CustomTable from "@/components/common/customTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { AppDispatch } from "@/redux/store";
+import { AppDispatch } from "@/redux/store";
 import {
   cancelOrderThunk,
   getOrderAdminThunk,
   updateOrderStatusThunk,
 } from "@/redux/thunks/Order";
-import type { IOrder, IOrderState, IOrderStatus } from "@/typings/order/order";
+import { IOrder, IOrderState, IOrderStatus } from "@/typings/order/order";
 import { formatDateToDisplay } from "@/utils/formatDateToDisplay";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";

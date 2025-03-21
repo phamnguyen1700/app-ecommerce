@@ -2,9 +2,9 @@
 
 import "@/app/globals.css";
 import CustomTable from "@/components/common/customTable";
-import type { AppDispatch } from "@/redux/store";
-import type { IBrand, IBrandFilter } from "@/typings/brand";
-import type { TableColumn } from "@/typings/table";
+import { AppDispatch } from "@/redux/store";
+import { IBrand, IBrandFilter } from "@/typings/brand";
+import { TableColumn } from "@/typings/table";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import {
