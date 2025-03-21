@@ -44,11 +44,13 @@ export default function ProductsPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [products, setProducts] = useState<IProduct[]>([]);
   const [user, setUser] = useState<{ skinType?: string } | null>(null);
-  const filteredProducts = products.filter(
-      (product: IProduct) => product.skinType?.includes(user?.skinType ?? "")
-    );
-  
 
+  const filteredProducts =
+    user?.skinType && user.skinType !== ""
+      ? products.filter((product: IProduct) =>
+          product.skinType?.includes(user.skinType ?? "")
+        )
+      : products; // Nếu không có user, hiển thị toàn bộ sản phẩm
 
   const getProductAPI = useCallback(async () => {
     try {
@@ -71,15 +73,36 @@ export default function ProductsPage() {
   return (
     <div className="container min-w-fit">
       <Banner title="OIL SKIN" />
-      <div className="w-full px-4 pt-2 pb-2">
-        <HomeSlider title="Dành cho bạn">
-          {filteredProducts.map((product, index) => (
-            <div className="flex-shrink-0 w-1/4" key={product._id || index}>
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </HomeSlider>
-      </div>
+
+      {user ? (
+        <div className="w-full px-4 pt-2 pb-2">
+          {products.length > 0 && (
+            <HomeSlider title="Dành cho bạn">
+              {(filteredProducts?.length ? filteredProducts : products).map(
+                (product, index) => (
+                  <div
+                    className="flex-shrink-0 w-1/4"
+                    key={product._id || index}
+                  >
+                    <ProductCard product={product} />
+                  </div>
+                )
+              )}
+            </HomeSlider>
+          )}
+        </div>
+      ) : (
+        <div className="w-full px-4 pt-2 pb-2">
+          <HomeSlider title="Best seller">
+            {products.map((product, index) => (
+              <div className="flex-shrink-0 w-1/4" key={product._id || index}>
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </HomeSlider>
+        </div>
+      )}
+
       <Banner title="OIL SKIN" description="Cho làn da khô thoáng!" />
       {/* Slider cho Blog */}
       <div className="w-full px-4 pt-2 pb-2">
@@ -107,7 +130,7 @@ export default function ProductsPage() {
           "The 3-Stripes have appeared on medal stands all around the world, but they've also had an influence that extends far beyond the field of play...",
           "adidas Originals apparel is a stylish complement to our lifestyle shoes. Our streetwear collections pull from the archives to put a modern spin on classics...",
         ]}
-        logo="/logo-adidas.png" 
+        logo="/logo-adidas.png"
       />
     </div>
   );
