@@ -35,3 +35,8 @@ export interface IProductFilter {
   minPrice?: string;
   maxPrice?: string;
 }
+
+export interface IUpdateProduct {
+  name: string;
+  price: number;
+}

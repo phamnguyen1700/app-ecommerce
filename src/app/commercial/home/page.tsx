@@ -43,6 +43,12 @@ const blogs = [
 export default function ProductsPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [products, setProducts] = useState<IProduct[]>([]);
+  const [user, setUser] = useState<{ skinType?: string } | null>(null);
+  const filteredProducts = products.filter(
+      (product: IProduct) => product.skinType?.includes(user?.skinType ?? "")
+    );
+  
+
 
   const getProductAPI = useCallback(async () => {
     try {
@@ -55,6 +61,10 @@ export default function ProductsPage() {
   }, [dispatch]);
 
   useEffect(() => {
+    const storedUser = localStorage.getItem("user"); // 🔹 Lấy dữ liệu từ localStorage
+    if (storedUser) {
+      setUser(JSON.parse(storedUser)); // 🔹 Parse JSON và lưu vào state
+    }
     getProductAPI();
   }, [dispatch, getProductAPI]);
 
@@ -62,8 +72,8 @@ export default function ProductsPage() {
     <div className="container min-w-fit">
       <Banner title="OIL SKIN" />
       <div className="w-full px-4 pt-2 pb-2">
-        <HomeSlider title="Mục yêu thích">
-          {products.map((product, index) => (
+        <HomeSlider title="Dành cho bạn">
+          {filteredProducts.map((product, index) => (
             <div className="flex-shrink-0 w-1/4" key={product._id || index}>
               <ProductCard product={product} />
             </div>

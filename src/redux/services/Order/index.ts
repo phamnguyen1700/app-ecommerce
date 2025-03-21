@@ -83,3 +83,23 @@ export const cancelOrderService = async (id: string) => {
     throw err;
   }
 }
+
+export const createDeliService = async (id: string) => {
+  const res = await API.post(`/deliveries/${id}`);
+  return res.data;
+}
+
+export const markAsShippingService = async (id: string) => {
+  const res = await API.put(`/deliveries/${id}/shipping`);
+  return res.data;
+}
+
+export const confirmShippingService = async (id: string) => {
+  const res = await API.put(`/deliveries/${id}/confirm`);
+  return res.data;
+}
+
+export const markAsShipped = async (id: string) => {
+  const res = await API.put(`/deliveries/${id}/mark-shipped`);
+  return res.data;
+}

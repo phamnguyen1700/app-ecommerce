@@ -116,7 +116,6 @@ export default function Header() {
             })
           ).unwrap();
   
-          toast.success("Đăng nhập thành công!");
           setOpenUser(false);
           reset();
           setTimeout(() => {

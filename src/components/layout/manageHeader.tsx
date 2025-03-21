@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Sidebar from "./nav/sidebar";
-import { SearchInput } from "../common/searchInput";
 import Icon from "@/components/common/icon";
 import {
   DropdownMenu,
@@ -63,7 +62,6 @@ export default function ManagementHeader() {
 
       {/* Search & Icons */}
       <div className="flex items-center space-x-4">
-        <SearchInput />
         <Icon name="bell" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

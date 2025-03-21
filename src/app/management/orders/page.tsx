@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppDispatch } from "@/redux/store";
 import {
   cancelOrderThunk,
+  createDeliveryThunk,
   getOrderAdminThunk,
   updateOrderStatusThunk,
 } from "@/redux/thunks/Order";
@@ -65,14 +66,21 @@ export default function ProductsPage() {
 
   const handleProcess = (id: string, orderStatus: IOrderStatus) => {
     dispatch(updateOrderStatusThunk({ id, orderStatus }));
+    window.location.reload();
   };
 
   const handleCancel = (id: string) => {
     dispatch(cancelOrderThunk({ id }));
+    window.location.reload();
+
   };
 
-  const handleShipping = () => {
-    alert("Giao hàng thành công!");
+  const handleShipping = async (orderId: string) => {
+    try {
+      await dispatch(createDeliveryThunk(orderId)).unwrap();
+      window.location.reload(); // Làm mới trang sau khi cập nhật trạng thái
+    } catch {
+    }
   };
 
   const getOrdersAPI = useCallback(async () => {
@@ -133,7 +141,7 @@ export default function ProductsPage() {
             onClick={() => {
               if (order.isPaid) {
                 if (order.orderStatus === "Processing") {
-                  handleShipping();
+                  handleShipping(order._id || "");
                 } else {
                   handleProcess(order._id || "", "Processing");
                 }

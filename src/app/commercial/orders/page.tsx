@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { IOrder } from "@/typings/order/order";
 import { AppDispatch } from "@/redux/store";
 import { useDispatch } from "react-redux";
-import { getOrdersThunk } from "@/redux/thunks/Order";
+import { confirmShippingThunk, getOrdersThunk } from "@/redux/thunks/Order";
 import { formatDateToDisplay } from "@/utils/formatDateToDisplay";
 import CheckoutButton from "@/components/common/checkoutButton";
 import Image from "next/image";
@@ -58,6 +58,19 @@ export default function OrdersPage() {
     }
   }, [orders]); // eslint-disable-line
 
+  const handleConfirmReceived = async (orderId: string) => {
+    try {
+      await dispatch(confirmShippingThunk(orderId)).unwrap();
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === orderId ? { ...order, orderStatus: "Delivered" } : order
+        )
+      );
+    } catch {
+      return;
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 flex gap-4">
       {/* Danh sách order (trái) */}
@@ -101,8 +114,10 @@ export default function OrdersPage() {
               <Button
                 className="bg-white border-2 border-black text-black hover:border-b-4 hover:border-r-4 hover:bg-white"
                 variant="default"
+                onClick={() => handleConfirmReceived(order._id || "")}
+                disabled={order.orderStatus !== "Shipped"}
               >
-                Mua lại
+                Xác nhận đã nhận hàng
               </Button>
             </CardContent>
           </Card>

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { cancelOrderService, checkoutOrderService, createOrderService, getOrderAdminService, getOrdersService, updateOrderStatusService, updatePaidStatusService } from "@/redux/services/Order";
+import { cancelOrderService, checkoutOrderService, confirmShippingService, createDeliService, createOrderService, getOrderAdminService, getOrdersService, markAsShipped, markAsShippingService, updateOrderStatusService, updatePaidStatusService } from "@/redux/services/Order";
 import { IOrder, IOrderState, IOrderStatus } from "@/typings/order/order";
 import { toast } from "react-toastify";
 
@@ -106,3 +106,60 @@ export const cancelOrderThunk = createAsyncThunk(
     }
   }
 )
+
+
+export const createDeliveryThunk = createAsyncThunk(
+  "delivery/create",
+  async (orderId: string, { rejectWithValue }) => {
+    try {
+      const response = await createDeliService(orderId);
+      toast.success("Yêu cầu giao hàng đã được tạo thành công!");
+      return response;
+    } catch (error) {
+      toast.error("Lỗi khi tạo yêu cầu giao hàng!");
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const markAsShippingThunk = createAsyncThunk(
+  "delivery/update",
+  async (orderId: string, { rejectWithValue }) => {
+    try {
+      const response = await markAsShippingService(orderId);
+      toast.success("Đơn hàng đang được giao!");
+      return response;
+    } catch (error) {
+      toast.error("Lỗi khi tạo yêu cầu giao hàng!");
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const confirmShippingThunk = createAsyncThunk(
+  "delivery/confirmconfirm",
+  async (orderId: string, { rejectWithValue }) => {
+    try {
+      const response = await confirmShippingService(orderId);
+      toast.success("Đơn hàng đã được giao!");
+      return response;
+    } catch (error) {
+      toast.error("Lỗi khi tạo yêu cầu giao hàng!");
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const markAsShippedThunk = createAsyncThunk(
+  "delivery/update",
+  async (orderId: string, { rejectWithValue }) => {
+    try {
+      const response = await markAsShipped(orderId);
+      toast.success("Đơn hàng đang được giao!");
+      return response;
+    } catch (error) {
+      toast.error("Lỗi khi tạo yêu cầu giao hàng!");
+      return rejectWithValue(error);
+    }
+  }
+);

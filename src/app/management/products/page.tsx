@@ -3,8 +3,13 @@
 import "@/app/globals.css";
 import CustomTable from "@/components/common/customTable";
 import { AppDispatch } from "@/redux/store";
-import { getProductThunk } from "@/redux/thunks/Product";
-import { IProduct, IProductFilter } from "@/typings/product";
+import {
+  getProductThunk,
+  reactivateProductThunk,
+  softDeleteProductThunk,
+  updateProductThunk,
+} from "@/redux/thunks/Product";
+import { IProduct, IProductFilter, IUpdateProduct } from "@/typings/product";
 import { TableColumn } from "@/typings/table";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
@@ -30,12 +35,16 @@ import { IBrand } from "@/typings/brand";
 import { getBrandThunk } from "@/redux/thunks/Brand";
 import PriceSlider from "@/components/common/priceSlider";
 import AddProductDialog from "@/components/common/addProductForm";
+import { toast } from "react-toastify";
 
 export default function ManageProductPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [brands, setBrands] = useState<IBrand[]>([]); // Lưu danh sách brand
+  const [editingProducts, setEditingProducts] = useState<{
+    [key: string]: Partial<IProduct>;
+  }>({});
   const [filterParams, setFilterParams] = useState({
     keyword: "",
     category: "",
@@ -114,6 +123,83 @@ export default function ManageProductPage() {
     }
   };
 
+  const handleSoftDelete = async (productId: string) => {
+    try {
+      await dispatch(softDeleteProductThunk(productId)).unwrap();
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product._id === productId ? { ...product, isDeleted: true } : product
+        )
+      );
+    } catch {
+      return;
+    }
+  };
+
+  const handleReactivate = async (productId: string) => {
+    try {
+      await dispatch(reactivateProductThunk(productId)).unwrap();
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product._id === productId ? { ...product, isDeleted: false } : product
+        )
+      );
+    } catch {
+      return;
+    }
+  };
+
+  const handleEditChange = <K extends keyof IProduct>(
+    productId: string,
+    key: K,
+    value: IProduct[K]
+  ) => {  
+    setEditingProducts((prev) => ({
+      ...prev,
+      [productId]: {
+        ...prev[productId],
+        [key]: value,
+      },
+    }));
+  };
+
+  const handleUpdateProduct = async (productId: string) => {
+    try {
+      const updatedData = editingProducts[productId];
+
+      // Chỉ lấy name và price nếu chúng tồn tại
+      const updatePayload: Partial<IUpdateProduct> = {};
+
+      if (updatedData.name !== undefined) {
+        updatePayload.name = updatedData.name;
+      }
+
+      if (updatedData.price !== undefined) {
+        updatePayload.price = updatedData.price;
+      }
+
+      if (Object.keys(updatePayload).length === 0) {
+        toast.warn("Không có thay đổi nào để cập nhật!");
+        return;
+      }
+
+      await dispatch(
+        updateProductThunk({ productId, data: updatePayload as IUpdateProduct })
+      ).unwrap();
+
+      setEditingProducts((prev) => {
+        const updated = { ...prev };
+        delete updated[productId];
+        return updated;
+      });
+
+      toast.success("Sản phẩm đã được cập nhật!");
+      getProductAPI(); // Load lại danh sách sản phẩm
+    } catch {
+      toast.error("Cập nhật sản phẩm thất bại!");
+    }
+  };
+
   const productColumns: TableColumn<IProduct>[] = [
     {
       colName: "Hình ảnh",
@@ -133,7 +219,16 @@ export default function ManageProductPage() {
         </div>
       ),
     },
-    { colName: "Tên sản phẩm", render: (record: IProduct) => record.name },
+    {
+      colName: "Tên sản phẩm",
+      render: (record: IProduct) => (
+        <Input
+          type="text"
+          value={editingProducts[record._id]?.name ?? record.name}
+          onChange={(e) => handleEditChange(record._id, "name", e.target.value)}
+        />
+      ),
+    },
     {
       colName: "Thương hiệu",
       render: (record: IProduct) => (
@@ -147,11 +242,15 @@ export default function ManageProductPage() {
       ),
     },
     {
-      colName: "Giá",
+      colName: "Giá (VNĐ)",
       render: (record: IProduct) => (
-        <div className="text-xs text-center">
-          {record.price.toLocaleString()} VNĐ
-        </div>
+        <Input
+          type="number"
+          value={editingProducts[record._id]?.price ?? record.price}
+          onChange={(e) =>
+            handleEditChange(record._id, "price", parseFloat(e.target.value))
+          }
+        />
       ),
     },
     {
@@ -171,6 +270,37 @@ export default function ManageProductPage() {
       render: (record: IProduct) => (
         <div className="text-xs text-center">
           {new Date(record.createdAt).toLocaleDateString()}
+        </div>
+      ),
+    },
+    {
+      colName: "Hành động",
+      render: (record: IProduct) => (
+        <div className="flex gap-2 justify-center">
+          {!record.isDeleted ? (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => handleSoftDelete(record._id)}
+            >
+              Xóa
+            </Button>
+          ) : (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => handleReactivate(record._id)}
+            >
+              Khôi Phục
+            </Button>
+          )}
+          <>
+            {editingProducts[record._id] && (
+              <Button size="sm" onClick={() => handleUpdateProduct(record._id)}>
+                Cập Nhật
+              </Button>
+            )}
+          </>
         </div>
       ),
     },
