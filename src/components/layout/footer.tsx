@@ -22,31 +22,7 @@ export default function Footer() {
     <footer className="bg-gray-50 pt-12 pb-6">
       <div className="container mx-auto px-4 md:px-6">
         {/* Newsletter Section */}
-        <div className="mb-12 border-b border-gray-200 pb-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-xl font-bold mb-3">ĐĂNG KÝ NHẬN TIN</h3>
-            <p className="text-gray-600 mb-6">
-              Đăng ký để nhận thông tin về sản phẩm mới và ưu đãi đặc biệt
-            </p>
-            <form onSubmit={handleSubscribe} className="flex max-w-md mx-auto">
-              <Input
-                type="email"
-                placeholder="Email của bạn"
-                className="rounded-r-none focus-visible:ring-0 border-r-0"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <Button
-                type="submit"
-                className="rounded-l-none bg-black hover:bg-gray-800 text-white"
-              >
-                <Send className="h-4 w-4 mr-2" />
-                Đăng ký
-              </Button>
-            </form>
-          </div>
-        </div>
+        
 
         {/* Main Footer Links */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-10">
