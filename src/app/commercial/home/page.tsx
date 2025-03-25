@@ -72,7 +72,7 @@ export default function ProductsPage() {
 
   return (
     <div className="container min-w-fit">
-      <Banner title="OIL SKIN" />
+      <Banner title="OIL SKIN"/>
 
       {user ? (
         <div className="w-full px-4 pt-2 pb-2">

@@ -1,14 +1,15 @@
 import Image from "next/image";
 import React from "react";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 interface BannerProps {
-    title: string;
-    description?: string; // Mô tả có thể không có
-  }
+  title: string;
+  description?: string; // Mô tả có thể không có
+}
 
-  const Banner: React.FC<BannerProps> = ({ title, description }) => {
-    return (
+const Banner: React.FC<BannerProps> = ({ title, description }) => {
+  return (
     <div className="relative w-fit h-auto">
       {/* Hình ảnh nền */}
       <Image
@@ -35,12 +36,15 @@ interface BannerProps {
         )}
 
         {/* Button */}
-        <Button
-          variant="link"
-          className="border-2 border-black mt-2 bg-white text-black font-light px-4 py-2 rounded-md hover:border-4 hover:border-b-8 hover:border-r-8 hover:border-black transition w-max"
-        >
-          Khám phá thêm →
-        </Button>
+
+        <Link href="https://tinalemakeup.vn/hoc-trang-diem-o-dau-tai-ha-noi-co-chat-luong-tot-nhat-hien-nay">
+          <Button
+            variant="link"
+            className="border-2 border-black mt-2 bg-white text-black font-light px-4 py-2 rounded-md hover:border-4 hover:border-b-8 hover:border-r-8 hover:border-black transition w-max"
+          >
+            Khám phá thêm →
+          </Button>
+        </Link>
       </div>
     </div>
   );

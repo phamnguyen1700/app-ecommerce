@@ -19,7 +19,11 @@ import {
 } from "@/components/common/sideDrawer";
 import Icon from "@/components/common/icon";
 import { useDispatch } from "react-redux";
-import { loginThunk, refreshTokenThunk, registerThunk } from "@/redux/thunks/Auth";
+import {
+  loginThunk,
+  refreshTokenThunk,
+  registerThunk,
+} from "@/redux/thunks/Auth";
 import { AppDispatch } from "@/redux/store";
 import Navbar from "@/components/layout/nav/commercialNav";
 import Image from "next/image";
@@ -88,19 +92,19 @@ export default function Header() {
   const handleContinue = async (data: IReg) => {
     if (signUp) {
       try {
-         await dispatch(
+        await dispatch(
           registerThunk({
             name: data.name,
             email: data.email,
             password: data.password,
           })
         ).unwrap();
-  
+
         toast.success("Đăng ký thành công!");
         setSignUp(false); // Chuyển về màn hình đăng nhập
         reset();
-      } catch  {
-        toast.error( "Đăng ký thất bại!");
+      } catch {
+        toast.error("Đăng ký thất bại!");
       }
     } else {
       // Xử lý đăng nhập
@@ -115,14 +119,14 @@ export default function Header() {
               password: watch("loginPassword"),
             })
           ).unwrap();
-  
+
           setOpenUser(false);
           reset();
           setTimeout(() => {
             window.location.reload(); // Reload trang sau khi đăng nhập thành công
           }, 1500); // Chờ 1.5 giây để người dùng thấy thông báo trước khi reload
-        } catch  {
-          toast.error( "Đăng nhập thất bại!");
+        } catch {
+          toast.error("Đăng nhập thất bại!");
         }
       }
     }
@@ -154,7 +158,7 @@ export default function Header() {
         </div>
       </div>
       <div className="grid grid-cols-3 items-center pt-3 px-8 border-b">
-        <div className="flex justify-start">LOGO</div>
+        <div className="flex justify-start font-bold">HISAKI</div>
         <Navbar />
         <div className="flex justify-end gap-5">
           <SearchInput />
@@ -233,12 +237,14 @@ export default function Header() {
               </DialogTrigger>
               <DialogContent className="w-full max-w-96 max-h-[70vh] overflow-scroll p-6 rounded-none z-[500]">
                 <DialogHeader>
-                  <DialogTitle className="text-2xl">LOGO</DialogTitle>
+                  <DialogTitle className="text-2xl font-bold">
+                    HISAKI
+                  </DialogTitle>
                 </DialogHeader>
                 <b className="text-3xl">WELCOME TO HISAKI COSMETIC</b>
                 <div className="font-thin text-gray-400 text-xs">
-                  Get free shipping, discount vouchers and members only products
-                  when you’re in adiClub.
+                  Miễn phí vận chuyển, voucher giảm giá và các sản phẩm chỉ dành
+                  cho thành viên.
                 </div>
 
                 {watch("loginEmail") === "" ? (
@@ -349,17 +355,16 @@ export default function Header() {
                   className="w-1/3 py-3 font-bold text-white bg-black hover:text-gray-300"
                   onClick={handleSubmit(handleContinue)}
                 >
-                  CONTINUE →
+                  Tiếp tục →
                 </Button>
                 <div className="font-light text-gray-400 text-xs">
-                  By clicking the “Continue” button, you are joining adiClub,
-                  will receive emails with the latest news and updates, and
-                  agree to the TERMS OF USE and ADICLUB TERMS AND CONDITIONS and
-                  acknowledge you have read the ADIDAS PRIVACY POLICY. If you
-                  are a California resident, the adiClub membership may be
-                  considered a financial incentive. Please see the Financial
-                  Incentives section of our CALIFORNIA PRIVACY NOTICE for
-                  details.
+                  Bằng cách nhấp vào nút Tiếp tụctục, bạn đang tham gia
+                  hisakiClub, sẽ nhận được email với tin tức và cập nhật mới
+                  nhất, và đồng ý với ĐIỀU KHOẢN SỬ DỤNG và ĐIỀU KHOẢN VÀ ĐIỀU
+                  KIỆN hisakiClub và xác nhận bạn đã đọc CHÍNH SÁCH QUYỀN RIÊNG
+                  TƯ CỦA ADIDAS.Với tư cách thành viên hisakiClub có thể được
+                  coi là một động lực tài chính. Vui lòng xem Tài chính Phần ưu
+                  đãi của THÔNG BÁO VỀ QUYỀN RIÊNG của chúng tôi cho Chi tiết.
                 </div>
               </DialogContent>
             </Dialog>
