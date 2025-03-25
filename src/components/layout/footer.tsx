@@ -2,27 +2,14 @@
 
 import type React from "react";
 
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Facebook, Instagram, Youtube, Send, CreditCard } from "lucide-react";
+import { Facebook, Instagram, Youtube, CreditCard } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 
 export default function Footer() {
-  const [email, setEmail] = useState("");
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle newsletter subscription
-    console.log("Subscribed with:", email);
-    setEmail("");
-  };
-
   return (
     <footer className="bg-gray-50 pt-12 pb-6">
       <div className="container mx-auto px-4 md:px-6">
         {/* Newsletter Section */}
-        
 
         {/* Main Footer Links */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-10">
