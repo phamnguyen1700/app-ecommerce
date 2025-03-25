@@ -5,10 +5,12 @@ import {
   reactivateProduct,
   softDeleteProduct,
   updateProductService,
+  getProductByIdService,
 } from "@/redux/services/Product";
 import { IProductFilter, IUpdateProduct } from "@/typings/product";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 export const getAllProductThunk = createAsyncThunk(
   "products/fetchProducts",
@@ -106,6 +108,36 @@ export const updateProductThunk = createAsyncThunk(
     } catch {
       toast.error("Lỗi khi cập nhật sản phẩm!");
       return;
+    }
+  }
+);
+export const getRecommendedProducts = createAsyncThunk(
+  'product/getRecommendedProducts',
+  async (skinType: string) => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/recommended?skinType=${skinType}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+); 
+export const getProductByIdThunk = createAsyncThunk(
+  "products/fetchProductById",
+  async (id : string, { rejectWithValue }) => {
+    try {
+      const data = await getProductByIdService(id); // Gọi API lấy sản phẩm theo ID
+      console.log("thunk:", data)
+      return data; // Trả về dữ liệu sản phẩm
+
+    } catch (err) {
+      console.error(`Error fetching product with ID ${id}:`, err);
+
+      if (err instanceof Error) {
+        return rejectWithValue(err.message);
+      }
+
+      return rejectWithValue("Không thể lấy thông tin sản phẩm.");
     }
   }
 );
