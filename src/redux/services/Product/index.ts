@@ -55,3 +55,14 @@ export const updateProductService = async (productId: string, data: IUpdateProdu
     return;
   }
 };
+export const getProductByIdService = async (id: string) => {
+  try {
+    const res = await API.get(`/products/${id}`);
+    console.log("data:", res.data)
+    return res.data;
+    
+  } catch (err) {
+    console.error(`Error fetching product with ID ${id}:`, err);
+    throw new Error("Không thể lấy thông tin sản phẩm.");
+  }
+};

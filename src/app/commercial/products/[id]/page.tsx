@@ -23,7 +23,7 @@ import {
 } from "@/redux/thunks/Feedback";
 import { IFeedback } from "@/typings/feedback";
 import { toast } from "react-toastify";
-
+import { IUser } from "@/typings/auth";
 interface RecentlyViewedProduct {
   _id: string;
   name: string;
@@ -43,8 +43,8 @@ export default function ProductDetailPage() {
     []
   );
   const dispatch = useDispatch<AppDispatch>();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const token = localStorage.getItem("accessToken");
+  const [user, setUser] = useState<IUser | null>(null);
+  const [token, setToken] = useState<string>("");
   const [feedbackState, setFeedbackState] = useState({
     rating: 0,
     comment: "",
@@ -202,6 +202,20 @@ export default function ProductDetailPage() {
       toast.error("Có lỗi xảy ra khi xóa đánh giá");
     }
   };
+  useEffect(() => {
+    // Chỉ chạy khi component đã được mount trên browser
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      const storedToken = localStorage.getItem("accessToken");
+
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+      if (storedToken) {
+        setToken(storedToken);
+      }
+    }
+  }, []);
   useEffect(() => {
     if (productId) {
       getProductAPI(productId);
@@ -422,13 +436,13 @@ export default function ProductDetailPage() {
           <div className="mt-16">
   <h2 className="text-2xl font-bold mb-6">Reviews</h2>
 
-  <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
-    <div className="flex gap-4">
+  <div className="overflow-y-auto max-h-96">
+    <div className="flex-col gap-4">
       {Array.isArray(feedbacks) && feedbacks.length > 0 ? (
         feedbacks.map((feedback, index) => (
           <div
             key={feedback._id || `feedback-${index}`}
-            className="bg-white p-6 rounded-lg shadow-sm flex-shrink-0 w-80"
+            className="bg-white p-6 rounded-lg shadow-sm"
           >
             <div className="flex justify-between items-start">
               <div>
@@ -455,10 +469,6 @@ export default function ProductDetailPage() {
                   {new Date(feedback.createdAt).toLocaleDateString()}
                 </span>
               </div>
-
-              {console.log("Feedback userId:", feedback.userId)}
-              {console.log("Current user ID:", user?.id)}
-
               {user && user.role !== "admin" && feedback.userId?._id === user.id && (
                 <div className="flex gap-2">
                   <button onClick={() => handleEditFeedback(feedback)} className="p-1 hover:bg-gray-100 rounded">
@@ -490,7 +500,7 @@ export default function ProductDetailPage() {
             {recentlyViewed.map((item) => (
               <a
                 key={item._id}
-                href={`/commercial/detail/${item._id}`}
+                href={`/commercial/products/${item._id}`}
                 className="group"
               >
                 <div className="aspect-square relative overflow-hidden rounded-lg mb-3">
@@ -523,7 +533,7 @@ export default function ProductDetailPage() {
               {recommendedProducts.map((item) => (
                 <a
                   key={item._id}
-                  href={`/commercial/detail/${item._id}`}
+                  href={`/commercial/products/${item._id}`}
                   className="group"
                 >
                   <div className="aspect-square relative overflow-hidden rounded-lg mb-3">
