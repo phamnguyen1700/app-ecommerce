@@ -21,6 +21,8 @@ export const loginThunk = createAsyncThunk(
       toast.success("Đăng nhập thành công!");
       return res;
     } catch {
+      toast.error("Đăng nhập thất bại!");
+
       return [];
     }
   }
