@@ -125,12 +125,12 @@ export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
       couponCode: selectedCoupon?.code,
       paymentMethod: "Stripe",
       shippingAddress: {
-        fullName: storedUser.address.fullName,
+        fullName: storedUser.name,
         street: storedUser.address.street,
         city: storedUser.address.city,
         district: storedUser.address.district,
         province: storedUser.address.province,
-        phone: storedUser.address.phone,
+        phone: "123456789",
       },
     };
     try {

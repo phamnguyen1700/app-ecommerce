@@ -139,6 +139,7 @@ export default function Header() {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     window.location.reload();
+    router.push("/");
   };
 
   return (

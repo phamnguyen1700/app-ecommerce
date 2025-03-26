@@ -8,8 +8,7 @@ export const getAllCouponThunk = createAsyncThunk(
     try {
       const data = await getAllCouponService();
       return data.coupons;
-    } catch (err) {
-      console.error("Lỗi khi gọi API:", err);
+    } catch  {
       return [];
     }
   }
