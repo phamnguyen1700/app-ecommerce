@@ -1,6 +1,7 @@
 import { banUserService, getAllUserService, unbanUserService } from "@/redux/services/User";
 import { IUserFilter, IUserState } from "@/typings/user";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 
 export const getAllUserThunk = createAsyncThunk<IUserState, Partial<IUserFilter>>(
   "user/getAll",
@@ -31,9 +32,11 @@ export const toggleBanUserThunk = createAsyncThunk<
       } else {
         await unbanUserService(id);
       }
+      toast.success(`Đã ${isBanned ? "cấm" : "bỏ cấm"} người dùng thành công`);
       return { id, isBanned };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Lỗi không xác định";
+      toast.error(`Đã xảy ra lỗi khi ${isBanned ? "cấm" : "bỏ cấm"} người dùng`);
       return rejectWithValue(errorMessage);
     }
   }

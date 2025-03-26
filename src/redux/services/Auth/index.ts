@@ -27,3 +27,12 @@ export const registerService = async (data : IReg) => {
     return console.log(error);
   }
 }
+
+export const verifyEmail = async (token: string) => {
+  try {
+    const res = await API.get(`/auth/verify-email/${token}`);
+    return res.data;
+  } catch (error) {
+    return console.log(error);
+  }
+}

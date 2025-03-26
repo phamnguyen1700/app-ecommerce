@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 //   SelectValue,
 // } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatMoney } from "@/hooks/formatMoney";
 import { AppDispatch } from "@/redux/store";
 import {
   cancelOrderThunk,
@@ -111,7 +112,11 @@ export default function ProductsPage() {
     {
       colName: "Tổng Tiền",
       render: (order: IOrder) => (
-        <div className="text-xs text-center">{`${order.totalAmount} VNĐ`}</div>
+        <div className="text-xs text-center">
+          {order.totalAmount !== undefined
+            ? formatMoney(order.totalAmount)
+            : "N/A"}
+        </div>
       ),
     },
     {
@@ -122,10 +127,11 @@ export default function ProductsPage() {
     },
     {
       colName: "Trạng Thái",
+      className: "text-center",
       render: (order: IOrder) => {
         if (order.orderStatus === "Cancelled") {
           return (
-            <span className="px-3 py-1 rounded text-center min-w-[140px] inline-block bg-gray-500 text-white cursor-not-allowed">
+            <span className="flex justify-center px-3 py-1 rounded text-center min-w-[140px] bg-gray-500 text-white cursor-not-allowed">
               Đã hủy
             </span>
           );
@@ -133,7 +139,7 @@ export default function ProductsPage() {
 
         if (order.orderStatus === "Shipped") {
           return (
-            <span className="px-3 py-1 rounded text-center min-w-[140px] inline-block border border-green-500 text-green-600 bg-white">
+            <span className="flex justify-center px-3 py-1 rounded text-center min-w-[140px] border border-green-500 text-green-600 bg-white">
               Đã giao hàng
             </span>
           );
@@ -141,14 +147,14 @@ export default function ProductsPage() {
 
         if (order.orderStatus === "Delivered") {
           return (
-            <span className="px-3 py-1 rounded text-center min-w-[140px] inline-block border border-green-600 text-green-900 bg-green-600">
+            <span className=" flex justify-center px-3 py-1 rounded text-center min-w-[140px]  border border-green-600 text-green-900 bg-green-600">
               Đã nhận hàng
             </span>
           );
         }
         return (
           <span
-            className={`px-3 py-1 rounded text-center min-w-[140px] inline-block transition-all duration-200 ${
+            className={` flex justify-center px-3 py-1 rounded text-center min-w-[140px]  transition-all duration-200 ${
               order.isPaid
                 ? "bg-green-500 text-green-900 hover:bg-green-500 hover:text-white cursor-pointer"
                 : "bg-red-500 text-red-900 hover:bg-red-500 hover:text-white cursor-pointer"

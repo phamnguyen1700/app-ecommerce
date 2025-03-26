@@ -4,6 +4,7 @@ import { IProductCardProps } from "@/typings/product";
 import Image from "next/image";
 import { AddToCartButton } from "./addToCartButton";
 import { useRouter } from "next/navigation";
+import { formatMoney } from "@/hooks/formatMoney";
 
 export default function ProductCard({ product }: IProductCardProps) {
   const router = useRouter();
@@ -50,7 +51,7 @@ export default function ProductCard({ product }: IProductCardProps) {
         </div>
 
         <div className="flex justify-between items-center mt-3">
-          <p className="text-sm font-semibold">${product.price.toFixed(2)}</p>
+          <p className="text-sm font-semibold">{formatMoney(product.price)}</p>
           <div onClick={(e) => e.stopPropagation()}>
             <AddToCartButton product={product} />
           </div>

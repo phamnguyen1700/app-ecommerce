@@ -14,9 +14,9 @@ interface PriceSliderProps {
 
 export default function PriceSlider({
   minPrice = 0,
-  maxPrice = 50000000,
+  maxPrice = 2000000,
   minLimit = 0,
-  maxLimit = 50000000,
+  maxLimit = 2000000,
   step = 10000,
   onChange,
 }: PriceSliderProps) {

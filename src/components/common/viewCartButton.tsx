@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { ICoupon } from "@/typings/user";
 import { getAllCouponThunk } from "@/redux/thunks/Coupon";
+import { formatMoney } from "@/hooks/formatMoney";
 
 interface CartItem {
   product: string;
@@ -28,7 +29,7 @@ interface CartItem {
   quantity: number;
 }
 
-export default function ViewCartButton() {
+export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
   const router = useRouter();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [coupons, setCoupons] = useState<ICoupon[]>([]);
@@ -43,17 +44,29 @@ export default function ViewCartButton() {
   };
 
   useEffect(() => {
+    if (!isLoggin) return;
+
     const fetchCoupons = async () => {
       try {
         const res = await dispatch(getAllCouponThunk()).unwrap();
-        setCoupons(res);
+
+        const storedUser = JSON.parse(
+          localStorage.getItem(USER_STORAGE_KEY) || "null"
+        );
+        const userId = storedUser?._id;
+
+        const filteredCoupons = res.filter(
+          (coupon: ICoupon) => coupon.user === userId && !coupon.isUsed
+        );
+
+        setCoupons(filteredCoupons);
       } catch (err) {
         console.error("Lỗi khi lấy danh sách coupon:", err);
       }
     };
 
     fetchCoupons();
-  }, [dispatch]);
+  }, [dispatch, isLoggin]);
 
   useEffect(() => {
     updateCart();
@@ -98,8 +111,7 @@ export default function ViewCartButton() {
       return;
     }
 
-    const selectedCoupon = coupons.find(c => c.code === selectedCouponId);
-
+    const selectedCoupon = coupons.find((c) => c.code === selectedCouponId);
 
     const orderData: IOrder = {
       items: cart.map((item) => ({
@@ -185,7 +197,7 @@ export default function ViewCartButton() {
                   </div>
                   <div className="flex justify-between items-center">
                     <p className="text-xs text-gray-600">
-                      ${item.price.toFixed(2)}
+                      {formatMoney(item.price)}
                     </p>
                     <div className="flex items-center gap-2">
                       <Button
@@ -208,24 +220,28 @@ export default function ViewCartButton() {
                 </div>
               </div>
             ))}
-            <div className="space-y-2">
-              <label htmlFor="coupon" className="text-sm font-medium">
-                Mã giảm giá
-              </label>
-              <select
-                id="coupon"
-                className="w-full border rounded px-3 py-2 text-sm"
-                value={selectedCouponId ?? ""}
-                onChange={(e) => setSelectedCouponId(e.target.value || null)}
-              >
-                <option value="">-- Không dùng mã --</option>
-                {coupons.map((coupon) => (
-                  <option key={coupon._id} value={coupon.code}>
-                    {coupon.code} - Giảm {coupon.discount}%
-                  </option>
-                ))}
-              </select>
-            </div>
+
+            {isLoggin && (
+              <div className="space-y-2">
+                <label htmlFor="coupon" className="text-sm font-medium">
+                  Mã giảm giá
+                </label>
+                <select
+                  id="coupon"
+                  className="w-full border rounded px-3 py-2 text-sm"
+                  value={selectedCouponId ?? ""}
+                  onChange={(e) => setSelectedCouponId(e.target.value || null)}
+                >
+                  <option value="">-- Không dùng mã --</option>
+                  {coupons.map((coupon) => (
+                    <option key={coupon._id} value={coupon.code}>
+                      {coupon.code} - Giảm {coupon.discount}%
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <Button
               className="w-full bg-black text-white hover:bg-gray-800"
               onClick={handlePlaceOrder}

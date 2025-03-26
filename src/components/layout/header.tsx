@@ -372,7 +372,7 @@ export default function Header() {
             </Dialog>
           )}
 
-          <ViewCartButton />
+          <ViewCartButton isLoggin={!!loggedIn} />
         </div>
       </div>
       <QuizDrawer />

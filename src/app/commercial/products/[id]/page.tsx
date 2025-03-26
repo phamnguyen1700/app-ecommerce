@@ -24,6 +24,7 @@ import {
 import { IFeedback } from "@/typings/feedback";
 import { toast } from "react-toastify";
 import { IUser } from "@/typings/auth";
+import { formatMoney } from "@/hooks/formatMoney";
 interface RecentlyViewedProduct {
   _id: string;
   name: string;
@@ -309,7 +310,7 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            <div className="text-2xl font-bold">${product.price}</div>
+            <div className="text-2xl font-bold">{formatMoney(product.price)}</div>
 
             {/* Skin Type */}
             <div className="border-t pt-4">

@@ -82,8 +82,8 @@ export default function ManageUserPage() {
           user._id === id ? { ...user, isBanned } : user
         )
       );
-    } catch (err) {
-      console.error("Lỗi khi cập nhật trạng thái ban:", err);
+    } catch  {
+      console.error("Lỗi khi cập nhật trạng thái ban:");
     }
   };
 
@@ -91,7 +91,9 @@ export default function ManageUserPage() {
     {
       colName: "Tên",
       render: (record: IUser) => (
-        <div className="text-xs text-left">{record.name}</div>
+        <div className="flex justify-center text-xs text-left">
+          {record.name}
+        </div>
       ),
     },
     {
@@ -130,7 +132,9 @@ export default function ManageUserPage() {
     {
       colName: "Số điện thoại",
       render: (record: IUser) => (
-        <div className="text-xs text-left">{record.email}</div>
+        <div className="flex justify-center text-xs text-left">
+          {record.address?.phone || "N/A"}
+        </div>
       ),
     },
     {
@@ -144,10 +148,14 @@ export default function ManageUserPage() {
     {
       colName: "Banned",
       render: (record: IUser) => (
-        <Switch
-          checked={record.isBanned}
-          onCheckedChange={() => handleBanToggle(record._id, !record.isBanned)}
-        />
+        <div className="flex justify-center">
+          <Switch
+            checked={record.isBanned}
+            onCheckedChange={() =>
+              handleBanToggle(record._id, !record.isBanned)
+            }
+          />
+        </div>
       ),
     },
   ];

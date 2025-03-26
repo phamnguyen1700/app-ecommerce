@@ -375,9 +375,9 @@ export default function ManageProductPage() {
 
         <PriceSlider
           minPrice={Number(filterParams.minPrice) || 0}
-          maxPrice={Number(filterParams.maxPrice) || 50000000}
+          maxPrice={Number(filterParams.maxPrice) || 2000000}
           minLimit={0}
-          maxLimit={50000000}
+          maxLimit={2000000}
           step={10000}
           onChange={([min, max]) => {
             updateFilterParams("minPrice", min.toString());
