@@ -21,8 +21,8 @@ export const loginThunk = createAsyncThunk(
       toast.success("Đăng nhập thành công!");
       return res;
     } catch {
-      toast.error("Đăng nhập thất bại!");
-
+      toast.error("Xác thực tài khoản trước khi đăng nhập!");
+      await new Promise((resolve) => setTimeout(resolve, 5000));
       return [];
     }
   }
