@@ -25,7 +25,7 @@ export type IOrderStatus =
 
 export interface IOrder {
   items: IOrderItem[];
-  totalAmount: number;
+  totalAmount?: number;
   paymentMethod: "Stripe";
   shippingAddress: Omit<IAddress, "_id">;
   user?: IUser;
@@ -36,4 +36,5 @@ export interface IOrder {
   createdAt?: string;
   updatedAt?: string;
   _id?: string;
+  couponCode?: string;
 }

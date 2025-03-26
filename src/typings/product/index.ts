@@ -40,3 +40,10 @@ export interface IUpdateProduct {
   name: string;
   price: number;
 }
+
+export interface ISearchProduct {
+  _id: string;
+  name: string;
+  price: number;
+  images: string[];
+}

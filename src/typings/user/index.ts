@@ -9,6 +9,17 @@ export interface IUserFilter {
   isVerified: boolean | undefined;
 }
 
+export interface ICoupon {
+  _id: string;
+  user: string; 
+  code: string;
+  discount: number;
+  expiresAt: string; 
+  isUsed: boolean;
+}
+
+
+
 export interface IUser {
   _id: string;
   name: string;
@@ -24,6 +35,8 @@ export interface IUser {
   passwordResetExpires?: string;
   passwordResetToken?: string;
   isBanned?: boolean;
+  points: number;
+  coupons: ICoupon[];
 }
 
 export interface IUserState {

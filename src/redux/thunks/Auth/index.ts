@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 export const loginThunk = createAsyncThunk(
     "auth/login",
-    async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
+    async ({ email, password }: { email: string; password: string }) => {
       try {
         const res = await loginService(email, password);
         console.log(res)
@@ -16,8 +16,8 @@ export const loginThunk = createAsyncThunk(
 
         toast.success("Đăng nhập thành công!");
         return res;
-      } catch (error) {
-        return rejectWithValue(error);
+      } catch {
+        return [];
       }
     }
   );

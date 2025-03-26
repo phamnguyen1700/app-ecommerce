@@ -3,6 +3,7 @@ export interface IAddress {
     street: string;
     city: string;
     district: string;
+    province: string;
     phone: string;
     _id: string;
   }

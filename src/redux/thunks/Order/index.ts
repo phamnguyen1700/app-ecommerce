@@ -141,7 +141,7 @@ export const confirmShippingThunk = createAsyncThunk(
   async (orderId: string, { rejectWithValue }) => {
     try {
       const response = await confirmShippingService(orderId);
-      toast.success("Đơn hàng đã được giao!");
+      toast.success("Xác nhận thành công!");
       return response;
     } catch (error) {
       toast.error("Lỗi khi tạo yêu cầu giao hàng!");

@@ -72,15 +72,13 @@ export default function ProductsPage() {
   const handleCancel = (id: string) => {
     dispatch(cancelOrderThunk({ id }));
     window.location.reload();
-
   };
 
   const handleShipping = async (orderId: string) => {
     try {
       await dispatch(createDeliveryThunk(orderId)).unwrap();
-      window.location.reload(); // Làm mới trang sau khi cập nhật trạng thái
-    } catch {
-    }
+      window.location.reload();
+    } catch {}
   };
 
   const getOrdersAPI = useCallback(async () => {
@@ -125,11 +123,30 @@ export default function ProductsPage() {
     {
       colName: "Trạng Thái",
       render: (order: IOrder) => {
-        return order.orderStatus === "Cancelled" ? (
-          <span className="px-3 py-1 rounded text-center min-w-[140px] inline-block bg-gray-500 text-white cursor-not-allowed">
-            Đã hủy
-          </span>
-        ) : (
+        if (order.orderStatus === "Cancelled") {
+          return (
+            <span className="px-3 py-1 rounded text-center min-w-[140px] inline-block bg-gray-500 text-white cursor-not-allowed">
+              Đã hủy
+            </span>
+          );
+        }
+
+        if (order.orderStatus === "Shipped") {
+          return (
+            <span className="px-3 py-1 rounded text-center min-w-[140px] inline-block border border-green-500 text-green-600 bg-white">
+              Đã giao hàng
+            </span>
+          );
+        }
+
+        if (order.orderStatus === "Delivered") {
+          return (
+            <span className="px-3 py-1 rounded text-center min-w-[140px] inline-block border border-green-600 text-green-900 bg-green-600">
+              Đã nhận hàng
+            </span>
+          );
+        }
+        return (
           <span
             className={`px-3 py-1 rounded text-center min-w-[140px] inline-block transition-all duration-200 ${
               order.isPaid

@@ -17,6 +17,8 @@ import { IOrder } from "@/typings/order/order";
 import { createOrderThunk } from "@/redux/thunks/Order";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { ICoupon } from "@/typings/user";
+import { getAllCouponThunk } from "@/redux/thunks/Coupon";
 
 interface CartItem {
   product: string;
@@ -29,6 +31,8 @@ interface CartItem {
 export default function ViewCartButton() {
   const router = useRouter();
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [coupons, setCoupons] = useState<ICoupon[]>([]);
+  const [selectedCouponId, setSelectedCouponId] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
 
   const updateCart = () => {
@@ -37,6 +41,19 @@ export default function ViewCartButton() {
     );
     setCart(storedCart);
   };
+
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        const res = await dispatch(getAllCouponThunk()).unwrap();
+        setCoupons(res);
+      } catch (err) {
+        console.error("Lỗi khi lấy danh sách coupon:", err);
+      }
+    };
+
+    fetchCoupons();
+  }, [dispatch]);
 
   useEffect(() => {
     updateCart();
@@ -81,6 +98,9 @@ export default function ViewCartButton() {
       return;
     }
 
+    const selectedCoupon = coupons.find(c => c.code === selectedCouponId);
+
+
     const orderData: IOrder = {
       items: cart.map((item) => ({
         product: item.product,
@@ -88,16 +108,14 @@ export default function ViewCartButton() {
         price: item.price,
         image: item.image,
       })),
-      totalAmount: cart.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      ),
+      couponCode: selectedCoupon?.code,
       paymentMethod: "Stripe",
       shippingAddress: {
         fullName: storedUser.address.fullName,
         street: storedUser.address.street,
         city: storedUser.address.city,
         district: storedUser.address.district,
+        province: storedUser.address.province,
         phone: storedUser.address.phone,
       },
     };
@@ -190,6 +208,24 @@ export default function ViewCartButton() {
                 </div>
               </div>
             ))}
+            <div className="space-y-2">
+              <label htmlFor="coupon" className="text-sm font-medium">
+                Mã giảm giá
+              </label>
+              <select
+                id="coupon"
+                className="w-full border rounded px-3 py-2 text-sm"
+                value={selectedCouponId ?? ""}
+                onChange={(e) => setSelectedCouponId(e.target.value || null)}
+              >
+                <option value="">-- Không dùng mã --</option>
+                {coupons.map((coupon) => (
+                  <option key={coupon._id} value={coupon.code}>
+                    {coupon.code} - Giảm {coupon.discount}%
+                  </option>
+                ))}
+              </select>
+            </div>
             <Button
               className="w-full bg-black text-white hover:bg-gray-800"
               onClick={handlePlaceOrder}
