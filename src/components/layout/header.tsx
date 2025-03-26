@@ -33,7 +33,7 @@ import Link from "next/link";
 import QuizDrawer from "../common/quiz";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { IReg } from "@/typings/auth";
+import { IReg, IUser } from "@/typings/auth";
 
 export default function Header() {
   const router = useRouter();
@@ -42,6 +42,7 @@ export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
   const [openUser, setOpenUser] = useState(false);
   const [signUp, setSignUp] = useState(false);
+  const [user, setUser] = useState<IUser | null>(null);
   const { register, setValue, watch, reset, handleSubmit } = useForm({
     defaultValues: {
       name: "",
@@ -57,6 +58,7 @@ export default function Header() {
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
+      setUser(JSON.parse(user));
       const parseUser = JSON.parse(user);
       if (parseUser.role === "admin") {
         setPermission(true);
@@ -168,9 +170,9 @@ export default function Header() {
               <DrawerTrigger asChild>
                 <Icons name="user" className=" cursor-pointer" />
               </DrawerTrigger>
-              <DrawerContent className="w-1/5 h-full rounded-none z-[500]">
+              <DrawerContent className="w-1/6 h-full rounded-none z-[500]">
                 <DrawerTitle className="text-center text-lg font-semibold pt-2 pb-6 bg-gray-200 border border-b-gray-300">
-                  HI NGUYỄN
+                  Hi {user?.name}
                   <Image
                     src="/assets/pictures/image.png"
                     alt="User Avatar"
