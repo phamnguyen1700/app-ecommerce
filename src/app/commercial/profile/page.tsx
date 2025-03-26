@@ -71,6 +71,7 @@ export default function ProfilePage() {
     try {
       const response = await API.put("/user/profile", formData);
       setUserData(response.data);
+      localStorage.setItem("user", JSON.stringify(response.data)); 
       setIsEditing(false);
       toast.success("Profile updated successfully");
       setTimeout(() => {
