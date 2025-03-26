@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getAllCouponService } from "@/redux/services/Coupon";
+import { getAllCouponService, redeemCouponService } from "@/redux/services/Coupon";
+import { ICoupon } from "@/typings/coupon";
 
 export const getAllCouponThunk = createAsyncThunk(
   "coupons/fetchCoupons",
@@ -10,6 +11,19 @@ export const getAllCouponThunk = createAsyncThunk(
     } catch (err) {
       console.error("Lỗi khi gọi API:", err);
       return [];
+    }
+  }
+);
+
+export const redeemCouponThunk = createAsyncThunk(
+  "coupons/redeemCoupon",
+  async (data: ICoupon) => {
+    try {
+      const res = await redeemCouponService(data);
+      return res;
+    } catch (err) {
+      console.error("Lỗi khi gọi API:", err);
+      return null;
     }
   }
 );

@@ -18,6 +18,7 @@ import {
   cancelOrderThunk,
   createDeliveryThunk,
   getOrderAdminThunk,
+  markAsShippingThunk,
   updateOrderStatusThunk,
 } from "@/redux/thunks/Order";
 import { IOrder, IOrderState, IOrderStatus } from "@/typings/order/order";
@@ -78,6 +79,7 @@ export default function ProductsPage() {
   const handleShipping = async (orderId: string) => {
     try {
       await dispatch(createDeliveryThunk(orderId)).unwrap();
+      await dispatch(markAsShippingThunk(orderId)).unwrap();
       window.location.reload();
     } catch {}
   };

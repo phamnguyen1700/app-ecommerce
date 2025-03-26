@@ -15,6 +15,7 @@ export interface IAddress {
     role: "admin" | "user"; 
     skinType: string;
     address: IAddress;
+    points: number;
   }
   
   export interface IReg {

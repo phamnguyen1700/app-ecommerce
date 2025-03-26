@@ -12,6 +12,7 @@ import CheckoutButton from "@/components/common/checkoutButton";
 import Image from "next/image";
 import { IProduct } from "@/typings/product";
 import { getAllProductThunk } from "@/redux/thunks/Product";
+import { formatMoney } from "@/hooks/formatMoney";
 
 export default function OrdersPage() {
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -166,7 +167,7 @@ export default function OrdersPage() {
                                   {productDetails.name}
                                 </div>
                                 <div className="font-bold text-sm ml-auto">
-                                  {item.price}
+                                  {formatMoney(item.price)}
                                 </div>
                               </div>
 
@@ -184,7 +185,7 @@ export default function OrdersPage() {
               </div>
               <div className="mb-2 flex justify-between items-center font-semibold">
                 <div>Tổng</div>
-                <p>{selectedOrder.totalAmount}</p>
+                <p>{formatMoney(selectedOrder.totalAmount ?? 0)}</p>
               </div>
               <div className="mb-2 flex justify-between items-center">
                 <div>Phương thức thanh toán</div>{" "}

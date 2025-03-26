@@ -20,3 +20,8 @@ export const getAllUserService = async (params?: Partial<IUserFilter>) => {
     const res = await API.put(`/user/unban/${id}`);
     return res.data;
   };
+
+  export const getUserService = async () => {
+    const res = await API.get("/user/profile");
+    return res.data;
+  }

@@ -30,9 +30,10 @@ export const getProductThunk = createAsyncThunk(
   async (params: Partial<IProductFilter>, { rejectWithValue }) => {
     try {
       const filteredParams = Object.fromEntries(
-        Object.entries(params).filter(
-          ([value]) => value !== "--" && value !== ""
-        )
+        Object.entries(params).map(([key, value]) => [
+          key,
+          value === "--" ? "" : value,
+        ])
       );
 
       const data = await getProductService(filteredParams);

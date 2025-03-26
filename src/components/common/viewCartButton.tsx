@@ -34,6 +34,8 @@ export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [coupons, setCoupons] = useState<ICoupon[]>([]);
   const [selectedCouponId, setSelectedCouponId] = useState<string | null>(null);
+
+  
   const dispatch = useDispatch<AppDispatch>();
 
   const updateCart = () => {
@@ -53,7 +55,7 @@ export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
         const storedUser = JSON.parse(
           localStorage.getItem(USER_STORAGE_KEY) || "null"
         );
-        const userId = storedUser?._id;
+        const userId = storedUser?.id;
 
         const filteredCoupons = res.filter(
           (coupon: ICoupon) => coupon.user === userId && !coupon.isUsed
@@ -142,6 +144,8 @@ export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
       console.error(error);
     }
   };
+
+
 
   return (
     <SideDrawer direction="right">
