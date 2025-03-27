@@ -10,20 +10,26 @@ import { toast } from "react-toastify";
 
 export const loginThunk = createAsyncThunk(
   "auth/login",
-  async ({ email, password }: { email: string; password: string }) => {
+  async (
+    { email, password }: { email: string; password: string },
+    { rejectWithValue }
+  ) => {
     try {
       const res = await loginService(email, password);
-      console.log(res);
       localStorage.setItem("accessToken", res.accessToken);
       localStorage.setItem("user", JSON.stringify(res.user));
       localStorage.setItem("refreshToken", res.refreshToken);
-
       toast.success("Đăng nhập thành công!");
       return res;
-    } catch {
-      toast.error("Xác thực tài khoản trước khi đăng nhập!");
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      return [];
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        toast.error("Xác thực tài khoản trước khi đăng nhập!");
+      } else if (error.response?.status === 401) {
+        toast.error("Email hoặc mật khẩu không chính xác!");
+      } else {
+        toast.error("Đã có lỗi xảy ra khi đăng nhập!");
+      }
+      return rejectWithValue(error.response?.data || "Lỗi không xác định");
     }
   }
 );
@@ -34,13 +40,11 @@ export const refreshTokenThunk = createAsyncThunk(
     try {
       const res = await refreshTokenService(refreshToken);
       const newAccessToken = res.accessToken;
-      console.log(res);
       localStorage.setItem("accessToken", newAccessToken);
-      console.log("Token refreshed!");
       return newAccessToken;
-    } catch (error) {
-      toast.error("Lỗi khi làm mới token, vui lòng đăng nhập lại!");
-      return rejectWithValue(error);
+    } catch (error: any) {
+      toast.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!");
+      return rejectWithValue(error.response?.data || "Lỗi không xác định");
     }
   }
 );
@@ -48,41 +52,52 @@ export const refreshTokenThunk = createAsyncThunk(
 export const logoutThunk = createAsyncThunk("auth/logout", async () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("user");
+  localStorage.removeItem("refreshToken");
+  toast.success("Đăng xuất thành công!");
 });
 
 export const registerThunk = createAsyncThunk(
   "auth/register",
-  async ({
-    name,
-    email,
-    password,
-  }: {
-    name: string;
-    email: string;
-    password: string;
-  }) => {
+  async (
+    {
+      name,
+      email,
+      password,
+    }: {
+      name: string;
+      email: string;
+      password: string;
+    },
+    { rejectWithValue }
+  ) => {
     const data: IReg = { name, email, password };
     try {
-      console.log("dữ liệu gửi đi");
       const response = await registerService(data);
-      toast.success("Đăng ký thành công!");
-
-      return response; // Trả về dữ liệu user để lưu vào Redux store
-    } catch {
-      return toast.error("Đăng ký thất bại!");
+      toast.success(
+        "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản."
+      );
+      return response;
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        toast.error("Email đã được sử dụng!");
+      } else {
+        toast.error("Đăng ký thất bại!");
+      }
+      return rejectWithValue(error.response?.data || "Lỗi không xác định");
     }
   }
 );
 
 export const verifyEmailThunk = createAsyncThunk(
   "auth/verifyEmail",
-  async (token: string) => {
+  async (token: string, { rejectWithValue }) => {
     try {
       const response = await verifyEmail(token);
       toast.success("Xác thực email thành công!");
       return response;
-    } catch {
-      return toast.error("Xác thực email thất bại!");
+    } catch (error: any) {
+      toast.error("Xác thực email thất bại!");
+      return rejectWithValue(error.response?.data || "Lỗi không xác định");
     }
   }
 );
