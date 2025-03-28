@@ -1,4 +1,5 @@
 import axios from "axios";
+import { RefreshError } from "@/typings/auth";
 
 export const API = axios.create({
   baseURL: "https://skincare-ecom-be.onrender.com/api",
@@ -100,7 +101,8 @@ API.interceptors.response.use(
 
         // Retry the original request
         return API(originalRequest);
-      } catch (refreshError: any) {
+      } catch (error: unknown) {
+        const refreshError = error as RefreshError;
         // Create a safe copy of refresh error details
         const safeRefreshErrorDetails = {
           message: refreshError?.message || "Unknown refresh error",

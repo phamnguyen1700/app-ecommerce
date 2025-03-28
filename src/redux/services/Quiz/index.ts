@@ -1,34 +1,15 @@
 import { API } from "@/utils/Api";
-
-interface QuizAnswer {
-  questionId: string;
-  answerId: string;
-  points: number;
-}
-
-interface QuizSubmission {
-  userId: string;
-  answers: QuizAnswer[];
-}
-
-interface QuizData {
-  title: string;
-  description: string;
-  questions: Array<{
-    question: string;
-    options: string[];
-    correctAnswer: string;
-    points: number;
-  }>;
-}
+import { APIError } from "@/typings/auth";
+import { QuizData } from "@/typings/quiz";
 
 export const getAllQuizzesService = async () => {
   try {
     const res = await API.get("/quizzes");
     return res.data;
-  } catch (error: any) {
-    console.error("Error fetching quizzes:", error);
-    throw error?.response?.data || error;
+  } catch (error: unknown) {
+    const apiError = error as APIError;
+    console.error("Error fetching quizzes:", apiError);
+    throw apiError.response?.data || apiError;
   }
 };
 
@@ -40,9 +21,10 @@ export const addQuizService = async (data: QuizData) => {
 
     const res = await API.post("/quizzes", data);
     return res.data;
-  } catch (error: any) {
-    console.error("Error adding quiz:", error);
-    throw error?.response?.data || error;
+  } catch (error: unknown) {
+    const apiError = error as APIError;
+    console.error("Error adding quiz:", apiError);
+    throw apiError.response?.data || apiError;
   }
 };
 
@@ -54,9 +36,10 @@ export const deleteQuizService = async (id: string) => {
 
     const res = await API.delete(`/quizzes/${id}`);
     return res.data;
-  } catch (error: any) {
-    console.error("Error deleting quiz:", error);
-    throw error?.response?.data || error;
+  } catch (error: unknown) {
+    const apiError = error as APIError;
+    console.error("Error deleting quiz:", apiError);
+    throw apiError.response?.data || apiError;
   }
 };
 
@@ -75,9 +58,10 @@ export const updateQuizService = async (
 
     const res = await API.put(`/quizzes/${id}`, data);
     return res.data;
-  } catch (error: any) {
-    console.error("Error updating quiz:", error);
-    throw error?.response?.data || error;
+  } catch (error: unknown) {
+    const apiError = error as APIError;
+    console.error("Error updating quiz:", apiError);
+    throw apiError.response?.data || apiError;
   }
 };
 
@@ -103,26 +87,32 @@ export const submitQuizAnswersService = async (data: {
       userId: data.userId,
       answers: data.answers,
     });
-    
+
     return res.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as APIError;
     // Enhanced error logging
     console.error("Quiz submission error:", {
-      status: error.response?.status || "No status",
-      data: typeof error.response?.data === "object" 
-        ? JSON.stringify(error.response.data) 
-        : String(error.response?.data || "No data"),
-      message: error.message || "No message",
+      status: apiError.response?.status || "No status",
+      data:
+        typeof apiError.response?.data === "object"
+          ? JSON.stringify(apiError.response.data)
+          : String(apiError.response?.data || "No data"),
+      message: apiError.message || "No message",
       config: {
-        url: error.config?.url || "No URL",
-        method: error.config?.method || "No method",
-        hasAuth: Boolean(error.config?.headers?.Authorization),
-        requestData: error.config?.data ? JSON.parse(error.config.data) : "No request data"
+        url: apiError.config?.url || "No URL",
+        method: apiError.config?.method || "No method",
+        hasAuth: Boolean(apiError.config?.headers?.Authorization),
+        requestData: apiError.config?.data
+          ? JSON.parse(apiError.config.data)
+          : "No request data",
       },
     });
 
     throw new Error(
-      error.response?.data?.message || error.message || "Quiz submission failed"
+      apiError.response?.data?.message ||
+        apiError.message ||
+        "Quiz submission failed"
     );
   }
 };

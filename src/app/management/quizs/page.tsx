@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { IIQuizQuestion, IQuizAnswer } from "@/typings/quiz";
+import { IQuiz, IQuizAnswer } from "@/typings/quiz";
 import {
   getAllQuizzesThunk,
   addQuizThunk,
@@ -19,12 +19,12 @@ import { Pencil, Trash2 } from "lucide-react";
 
 export default function QuizAdminPage() {
   const dispatch = useDispatch<AppDispatch>();
-  const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [quizzes, setQuizzes] = useState<IQuiz[]>([]);
   const [newQuestion, setNewQuestion] = useState("");
   const [answers, setAnswers] = useState(["", "", ""]);
   const [points, setPoints] = useState([1, 1, 1]);
   const [open, setOpen] = useState(false);
-  const [editingQuiz, setEditingQuiz] = useState<any>(null);
+  const [editingQuiz, setEditingQuiz] = useState<IQuiz | null>(null);
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -78,11 +78,11 @@ export default function QuizAdminPage() {
     }
   };
 
-  const handleEditQuiz = (quiz: any) => {
+  const handleEditQuiz = (quiz: IQuiz) => {
     setEditingQuiz(quiz);
     setNewQuestion(quiz.questions[0].question);
-    setAnswers(quiz.questions[0].answers.map((ans: any) => ans.text));
-    setPoints(quiz.questions[0].answers.map((ans: any) => ans.points));
+    setAnswers(quiz.questions[0].answers.map((ans: IQuizAnswer) => ans.text));
+    setPoints(quiz.questions[0].answers.map((ans: IQuizAnswer) => ans.points));
     setOpen(true);
   };
 
@@ -122,14 +122,14 @@ export default function QuizAdminPage() {
   const columns = [
     {
       colName: "Câu hỏi",
-      render: (item: any) => item.questions[0].question,
+      render: (item: IQuiz) => item.questions[0].question,
     },
     {
       colName: "Câu trả lời",
-      render: (item: any) => (
+      render: (item: IQuiz) => (
         <div className="min-w-[300px]">
           <ul className="list-none m-0 space-y-1">
-            {item.questions[0].answers.map((ans: any, idx: number) => (
+            {item.questions[0].answers.map((ans: IQuizAnswer, idx: number) => (
               <li key={idx} className="flex items-center gap-2">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-foreground shrink-0 mt-[2px]"></span>
                 <span>
@@ -143,7 +143,7 @@ export default function QuizAdminPage() {
     },
     {
       colName: "Thao tác",
-      render: (item: any) => (
+      render: (item: IQuiz) => (
         <div className="flex gap-1 justify-center">
           <Button
             variant="outline"

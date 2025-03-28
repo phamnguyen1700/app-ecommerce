@@ -16,11 +16,12 @@ import {
 import { AppDispatch } from "@/redux/store";
 import { toast } from "react-toastify";
 import { IProduct } from "@/typings/product";
+import { IQuiz, IQuizAnswer } from "@/typings/quiz";
 
 export default function QuizDrawer() {
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = useState(false);
-  const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [quizzes, setQuizzes] = useState<IQuiz[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: string]: { answerId: string; points: number };
   }>({});
@@ -145,13 +146,17 @@ export default function QuizDrawer() {
         toast.success("Cảm ơn bạn đã hoàn thành bài kiểm tra!");
         setOpen(false);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting answers:", {
-        error: error.toString(),
-        message: error.message || "Unknown error",
-        stack: error.stack || "No stack trace",
+        error: error instanceof Error ? error.toString() : "Unknown error",
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : "No stack trace",
       });
-      toast.error(error.message || "Có lỗi xảy ra khi gửi câu trả lời!");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Có lỗi xảy ra khi gửi câu trả lời!"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -195,7 +200,7 @@ export default function QuizDrawer() {
                       <h3 className="font-semibold">
                         {index + 1}. {quiz.questions[0].question}
                       </h3>
-                      {quiz.questions[0].answers.map((answer: any) => (
+                      {quiz.questions[0].answers.map((answer: IQuizAnswer) => (
                         <label
                           key={answer._id}
                           className="flex items-center space-x-2 text-sm"

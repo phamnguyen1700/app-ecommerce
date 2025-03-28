@@ -6,7 +6,9 @@ import {
   updateQuizService,
   submitQuizAnswersService,
 } from "@/redux/services/Quiz";
+import { APIError } from "@/typings/auth";
 import { toast } from "react-toastify";
+import { QuizData } from "@/typings/quiz";
 
 export const getAllQuizzesThunk = createAsyncThunk(
   "quizzes/fetchQuizzes",
@@ -14,22 +16,24 @@ export const getAllQuizzesThunk = createAsyncThunk(
     try {
       const data = await getAllQuizzesService();
       return data;
-    } catch (err) {
-      return rejectWithValue(err);
+    } catch (error: unknown) {
+      const apiError = error as APIError;
+      return rejectWithValue(apiError);
     }
   }
 );
 
 export const addQuizThunk = createAsyncThunk(
   "quizzes/addQuiz",
-  async (data: any) => {
+  async (data: QuizData) => {
     try {
       const response = await addQuizService(data);
       toast.success("Thêm câu hỏi thành công");
       return response;
-    } catch {
+    } catch (error: unknown) {
+      console.error("Error adding quiz:", error);
       toast.error("Thêm câu hỏi không thành công");
-      return;
+      return null;
     }
   }
 );
@@ -41,7 +45,8 @@ export const deleteQuizThunk = createAsyncThunk(
       await deleteQuizService(id);
       toast.success("Xóa câu hỏi thành công");
       return id;
-    } catch {
+    } catch (error: unknown) {
+      console.error("Error adding quiz:", error);
       toast.error("Xóa câu hỏi không thành công");
       return;
     }
@@ -50,14 +55,15 @@ export const deleteQuizThunk = createAsyncThunk(
 
 export const updateQuizThunk = createAsyncThunk(
   "quizzes/updateQuiz",
-  async ({ id, data }: { id: string; data: any }) => {
+  async ({ id, data }: { id: string; data: Partial<QuizData> }) => {
     try {
       const response = await updateQuizService(id, data);
       toast.success("Cập nhật câu hỏi thành công");
       return response;
-    } catch {
+    } catch (error: unknown) {
+      console.error("Error updating quiz:", error);
       toast.error("Cập nhật câu hỏi không thành công");
-      return;
+      return null;
     }
   }
 );
@@ -80,9 +86,10 @@ export const submitQuizAnswersThunk = createAsyncThunk(
       const response = await submitQuizAnswersService(data);
       toast.success("Gửi câu trả lời thành công!");
       return response;
-    } catch (error: any) {
-      toast.error(error.message || "Gửi câu trả lời không thành công!");
-      return rejectWithValue(error);
+    } catch (error: unknown) {
+      const apiError = error as APIError;
+      toast.error(apiError.message || "Gửi câu trả lời không thành công!");
+      return rejectWithValue(apiError);
     }
   }
 );

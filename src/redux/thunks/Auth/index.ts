@@ -4,7 +4,7 @@ import {
   verifyEmail,
 } from "./../../services/Auth/index";
 import { loginService } from "@/redux/services/Auth";
-import { IReg } from "@/typings/auth";
+import { APIError, IReg } from "@/typings/auth";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
@@ -26,15 +26,16 @@ export const loginThunk = createAsyncThunk(
 
       toast.success("Đăng nhập thành công!");
       return res;
-    } catch (error: any) {
-      if (error.message === "Email not verified") {
+    } catch (error: unknown) {
+      const apiError = error as APIError;
+      if (apiError.message === "Email not verified") {
         toast.error("Xác thực tài khoản trước khi đăng nhập!");
-      } else if (error.message === "Invalid credentials") {
+      } else if (apiError.message === "Invalid credentials") {
         toast.error("Email hoặc mật khẩu không chính xác!");
       } else {
         toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau!");
       }
-      throw error;
+      throw apiError;
     }
   }
 );
@@ -59,10 +60,11 @@ export const refreshTokenThunk = createAsyncThunk(
       localStorage.setItem("accessToken", newAccessToken);
       console.log("Token refreshed successfully!");
       return newAccessToken;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const apiError = error as APIError;
       console.error("Token refresh thunk failed:", {
-        message: error?.message || "Unknown error",
-        response: error?.response?.data || "No response data",
+        message: apiError.message || "Unknown error",
+        response: apiError.response?.data || "No response data",
       });
 
       // Clear auth data on refresh failure
@@ -71,7 +73,7 @@ export const refreshTokenThunk = createAsyncThunk(
       localStorage.removeItem("user");
 
       toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
-      return rejectWithValue(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -102,8 +104,10 @@ export const registerThunk = createAsyncThunk(
       toast.success("Đăng ký thành công!");
 
       return response; // Trả về dữ liệu user để lưu vào Redux store
-    } catch {
-      return toast.error("Đăng ký thất bại!");
+    } catch (error: unknown) {
+      console.error("Registration failed:", error);
+      toast.error("Đăng ký thất bại!");
+      return null;
     }
   }
 );
@@ -115,8 +119,10 @@ export const verifyEmailThunk = createAsyncThunk(
       const response = await verifyEmail(token);
       toast.success("Xác thực email thành công!");
       return response;
-    } catch {
-      return toast.error("Xác thực email thất bại!");
+    } catch (error: unknown) {
+      console.error("Email verification failed:", error);
+      toast.error("Xác thực email thất bại!");
+      return null;
     }
   }
 );
