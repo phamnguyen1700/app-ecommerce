@@ -6,8 +6,7 @@ export const getAllCouponService = async () => {
   return response.data;
 };
 
-
 export const redeemCouponService = async (data: ICoupon) => {
   const response = await API.post("/coupons/redeem", data);
   return response.data;
-}
+};

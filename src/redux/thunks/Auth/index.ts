@@ -13,17 +13,28 @@ export const loginThunk = createAsyncThunk(
   async ({ email, password }: { email: string; password: string }) => {
     try {
       const res = await loginService(email, password);
-      console.log(res);
+
+      // Validate response data
+      if (!res.accessToken || !res.refreshToken || !res.user || !res.user.id) {
+        throw new Error("Invalid login response data");
+      }
+
+      // Store auth data
       localStorage.setItem("accessToken", res.accessToken);
-      localStorage.setItem("user", JSON.stringify(res.user));
       localStorage.setItem("refreshToken", res.refreshToken);
+      localStorage.setItem("user", JSON.stringify(res.user));
 
       toast.success("Đăng nhập thành công!");
       return res;
-    } catch {
-      toast.error("Xác thực tài khoản trước khi đăng nhập!");
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      return [];
+    } catch (error: any) {
+      if (error.message === "Email not verified") {
+        toast.error("Xác thực tài khoản trước khi đăng nhập!");
+      } else if (error.message === "Invalid credentials") {
+        toast.error("Email hoặc mật khẩu không chính xác!");
+      } else {
+        toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau!");
+      }
+      throw error;
     }
   }
 );
@@ -32,22 +43,45 @@ export const refreshTokenThunk = createAsyncThunk(
   "auth/refreshToken",
   async (refreshToken: string, { rejectWithValue }) => {
     try {
+      if (!refreshToken || refreshToken.trim() === "") {
+        console.error("Empty refresh token provided");
+        throw new Error("No refresh token available");
+      }
+
       const res = await refreshTokenService(refreshToken);
       const newAccessToken = res.accessToken;
-      console.log(res);
+
+      if (!newAccessToken) {
+        console.error("No access token received in refresh response");
+        throw new Error("Invalid refresh token response");
+      }
+
       localStorage.setItem("accessToken", newAccessToken);
-      console.log("Token refreshed!");
+      console.log("Token refreshed successfully!");
       return newAccessToken;
-    } catch (error) {
-      toast.error("Lỗi khi làm mới token, vui lòng đăng nhập lại!");
+    } catch (error: any) {
+      console.error("Token refresh thunk failed:", {
+        message: error?.message || "Unknown error",
+        response: error?.response?.data || "No response data",
+      });
+
+      // Clear auth data on refresh failure
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+
+      toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
       return rejectWithValue(error);
     }
   }
 );
 
 export const logoutThunk = createAsyncThunk("auth/logout", async () => {
+  // Clear all auth-related data
   localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
+  toast.success("Đăng xuất thành công!");
 });
 
 export const registerThunk = createAsyncThunk(
