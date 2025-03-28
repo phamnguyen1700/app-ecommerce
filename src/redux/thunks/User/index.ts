@@ -1,4 +1,4 @@
-import { banUserService, getAllUserService, unbanUserService } from "@/redux/services/User";
+import { banUserService, getAllUserService, getUserService, unbanUserService } from "@/redux/services/User";
 import { IUserFilter, IUserState } from "@/typings/user";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -41,3 +41,11 @@ export const toggleBanUserThunk = createAsyncThunk<
     }
   }
 );
+
+export const getUserThunk = createAsyncThunk(
+  "user/getUser",
+  async () => {
+    const data = await getUserService();
+    return data ;
+  }
+)

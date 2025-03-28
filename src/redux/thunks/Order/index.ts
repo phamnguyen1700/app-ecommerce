@@ -11,7 +11,6 @@ export const createOrderThunk = createAsyncThunk(
       console.log("du lieu tra ve cua dat order:", data);
       return data;
     } catch (err) {
-      toast.error("Đặt hàng không thành công!");
       return rejectWithValue(err);
     }
   }

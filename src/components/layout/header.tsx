@@ -138,8 +138,8 @@ export default function Header() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
-    window.location.reload();
     router.push("/");
+    window.location.reload();
   };
 
   return (
