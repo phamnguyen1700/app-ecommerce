@@ -17,9 +17,10 @@ import { IOrder } from "@/typings/order/order";
 import { createOrderThunk } from "@/redux/thunks/Order";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { ICoupon } from "@/typings/user";
+import { ICoupon, IUser } from "@/typings/user";
 import { getAllCouponThunk } from "@/redux/thunks/Coupon";
 import { formatMoney } from "@/hooks/formatMoney";
+import { getAllUserThunk } from "@/redux/thunks/User";
 
 interface CartItem {
   product: string;
@@ -34,8 +35,7 @@ export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [coupons, setCoupons] = useState<ICoupon[]>([]);
   const [selectedCouponId, setSelectedCouponId] = useState<string | null>(null);
-
-  
+  const [user, setUser] = useState<IUser>();
   const dispatch = useDispatch<AppDispatch>();
 
   const updateCart = () => {
@@ -104,9 +104,7 @@ export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
   };
 
   const handlePlaceOrder = async () => {
-    const storedUser = JSON.parse(
-      localStorage.getItem(USER_STORAGE_KEY) || "null"
-    );
+    const storedUser = user;
 
     if (!storedUser || cart.length === 0) {
       alert("Vui lòng đăng nhập để tiếp tục!");
@@ -133,6 +131,7 @@ export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
         phone: "123456789",
       },
     };
+
     try {
       await dispatch(createOrderThunk(orderData)).unwrap();
       toast.success("Đơn hàng đã được tạo thành công!");
@@ -140,12 +139,29 @@ export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
       router.push("/commercial/orders");
       window.dispatchEvent(new Event("cartUpdated"));
     } catch (error) {
-      toast.error("Lỗi khi tạo đơn hàng, vui lòng thử lại!");
+      toast.error("Vui lòng thêm địa chỉ trước khi đặt hàng!");
       console.error(error);
     }
   };
 
+  useEffect(() => {
+    const getUserAPI = async () => {
+      try {
+        const res = await dispatch(getAllUserThunk({})).unwrap();
+        if (res && res.users && res.users.length > 0) {
+          setUser(res.users[0]);
+        }
+      } catch (error) {
+        console.error("Lỗi khi gọi API lấy thông tin người dùng:", error);
+      }
+    };
 
+    if (isLoggin) {
+      getUserAPI();
+    } else {
+      setUser(undefined);
+    }
+  }, [dispatch, isLoggin]);
 
   return (
     <SideDrawer direction="right">
