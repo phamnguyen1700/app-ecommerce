@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Input } from "../ui/input";
 import {
   Drawer as SideDrawer,
@@ -43,6 +43,14 @@ export default function Header() {
   const [openUser, setOpenUser] = useState(false);
   const [signUp, setSignUp] = useState(false);
   const [user, setUser] = useState<IUser | null>(null);
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    window.location.reload();
+    router.push("/");
+  }, [router]);
   const { register, setValue, watch, reset, handleSubmit } = useForm({
     defaultValues: {
       name: "",
@@ -77,14 +85,35 @@ export default function Header() {
 
   useEffect(() => {
     if (loggedIn !== null) {
+      // Check if token exists first
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        console.log("No refresh token found, logging out");
+        handleLogout();
+        return;
+      }
+
+      // Set up token refresh interval
       const interval = setInterval(() => {
         const refreshToken = localStorage.getItem("refreshToken") ?? "";
-        dispatch(refreshTokenThunk(refreshToken));
-      }, 1000 * 60 * 10);
+        if (refreshToken) {
+          dispatch(refreshTokenThunk(refreshToken))
+            .unwrap()
+            .catch((error) => {
+              console.error("Token refresh interval failed:", error);
+              // If token refresh fails, log out the user
+              handleLogout();
+            });
+        } else {
+          console.log("No refresh token available for refresh interval");
+          clearInterval(interval);
+          handleLogout();
+        }
+      }, 1000 * 60 * 10); // Every 10 minutes
 
       return () => clearInterval(interval);
     }
-  }, [loggedIn, dispatch]);
+  }, [loggedIn, dispatch, handleLogout]);
 
   const handleSignUp = () => {
     setSignUp(!signUp);
@@ -132,14 +161,6 @@ export default function Header() {
         }
       }
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
-    router.push("/");
-    window.location.reload();
   };
 
   return (

@@ -4,7 +4,7 @@ import {
   verifyEmail,
 } from "./../../services/Auth/index";
 import { loginService } from "@/redux/services/Auth";
-import { IReg } from "@/typings/auth";
+import { APIError, IReg } from "@/typings/auth";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
@@ -13,17 +13,29 @@ export const loginThunk = createAsyncThunk(
   async ({ email, password }: { email: string; password: string }) => {
     try {
       const res = await loginService(email, password);
-      console.log(res);
+
+      // Validate response data
+      if (!res.accessToken || !res.refreshToken || !res.user || !res.user.id) {
+        throw new Error("Invalid login response data");
+      }
+
+      // Store auth data
       localStorage.setItem("accessToken", res.accessToken);
-      localStorage.setItem("user", JSON.stringify(res.user));
       localStorage.setItem("refreshToken", res.refreshToken);
+      localStorage.setItem("user", JSON.stringify(res.user));
 
       toast.success("Đăng nhập thành công!");
       return res;
-    } catch {
-      toast.error("Xác thực tài khoản trước khi đăng nhập!");
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      return [];
+    } catch (error: unknown) {
+      const apiError = error as APIError;
+      if (apiError.message === "Email not verified") {
+        toast.error("Xác thực tài khoản trước khi đăng nhập!");
+      } else if (apiError.message === "Invalid credentials") {
+        toast.error("Email hoặc mật khẩu không chính xác!");
+      } else {
+        toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau!");
+      }
+      throw apiError;
     }
   }
 );
@@ -32,22 +44,46 @@ export const refreshTokenThunk = createAsyncThunk(
   "auth/refreshToken",
   async (refreshToken: string, { rejectWithValue }) => {
     try {
+      if (!refreshToken || refreshToken.trim() === "") {
+        console.error("Empty refresh token provided");
+        throw new Error("No refresh token available");
+      }
+
       const res = await refreshTokenService(refreshToken);
       const newAccessToken = res.accessToken;
-      console.log(res);
+
+      if (!newAccessToken) {
+        console.error("No access token received in refresh response");
+        throw new Error("Invalid refresh token response");
+      }
+
       localStorage.setItem("accessToken", newAccessToken);
-      console.log("Token refreshed!");
+      console.log("Token refreshed successfully!");
       return newAccessToken;
-    } catch (error) {
-      toast.error("Lỗi khi làm mới token, vui lòng đăng nhập lại!");
-      return rejectWithValue(error);
+    } catch (error: unknown) {
+      const apiError = error as APIError;
+      console.error("Token refresh thunk failed:", {
+        message: apiError.message || "Unknown error",
+        response: apiError.response?.data || "No response data",
+      });
+
+      // Clear auth data on refresh failure
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+
+      toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
+      return rejectWithValue(apiError);
     }
   }
 );
 
 export const logoutThunk = createAsyncThunk("auth/logout", async () => {
+  // Clear all auth-related data
   localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
+  toast.success("Đăng xuất thành công!");
 });
 
 export const registerThunk = createAsyncThunk(
@@ -68,8 +104,10 @@ export const registerThunk = createAsyncThunk(
       toast.success("Đăng ký thành công!");
 
       return response; // Trả về dữ liệu user để lưu vào Redux store
-    } catch {
-      return toast.error("Đăng ký thất bại!");
+    } catch (error: unknown) {
+      console.error("Registration failed:", error);
+      toast.error("Đăng ký thất bại!");
+      return null;
     }
   }
 );
@@ -81,8 +119,10 @@ export const verifyEmailThunk = createAsyncThunk(
       const response = await verifyEmail(token);
       toast.success("Xác thực email thành công!");
       return response;
-    } catch {
-      return toast.error("Xác thực email thất bại!");
+    } catch (error: unknown) {
+      console.error("Email verification failed:", error);
+      toast.error("Xác thực email thất bại!");
+      return null;
     }
   }
 );
