@@ -46,16 +46,23 @@ export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
   };
 
   useEffect(() => {
-    if (!isLoggin) return;
+    if (!isLoggin) {
+      setCoupons([]);
+      return;
+    }
+
+    const storedUser = JSON.parse(
+      localStorage.getItem(USER_STORAGE_KEY) || "null"
+    );
+
+    if (!storedUser) {
+      return;
+    }
 
     const fetchCoupons = async () => {
       try {
         const res = await dispatch(getAllCouponThunk()).unwrap();
-
-        const storedUser = JSON.parse(
-          localStorage.getItem(USER_STORAGE_KEY) || "null"
-        );
-        const userId = storedUser?.id;
+        const userId = storedUser.id;
 
         const filteredCoupons = res.filter(
           (coupon: ICoupon) => coupon.user === userId && !coupon.isUsed
@@ -64,6 +71,7 @@ export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
         setCoupons(filteredCoupons);
       } catch (err) {
         console.error("Lỗi khi lấy danh sách coupon:", err);
+        setCoupons([]);
       }
     };
 
@@ -145,23 +153,20 @@ export default function ViewCartButton({ isLoggin }: { isLoggin: boolean }) {
   };
 
   useEffect(() => {
-    const getUserAPI = async () => {
-      try {
-        const res = await dispatch(getAllUserThunk({})).unwrap();
-        if (res && res.users && res.users.length > 0) {
-          setUser(res.users[0]);
-        }
-      } catch (error) {
-        console.error("Lỗi khi gọi API lấy thông tin người dùng:", error);
-      }
-    };
-
     if (isLoggin) {
-      getUserAPI();
+      const storedUserStr = localStorage.getItem(USER_STORAGE_KEY);
+      if (storedUserStr) {
+        try {
+          const storedUser = JSON.parse(storedUserStr);
+          setUser(storedUser);
+        } catch (error) {
+          console.error("Lỗi khi parse thông tin user từ localStorage:", error);
+        }
+      }
     } else {
       setUser(undefined);
     }
-  }, [dispatch, isLoggin]);
+  }, [isLoggin]);
 
   return (
     <SideDrawer direction="right">
