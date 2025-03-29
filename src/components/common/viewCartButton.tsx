@@ -20,7 +20,6 @@ import { useRouter } from "next/navigation";
 import { ICoupon, IUser } from "@/typings/user";
 import { getAllCouponThunk } from "@/redux/thunks/Coupon";
 import { formatMoney } from "@/hooks/formatMoney";
-import { getAllUserThunk } from "@/redux/thunks/User";
 
 interface CartItem {
   product: string;
