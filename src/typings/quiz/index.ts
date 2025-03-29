@@ -1,38 +1,11 @@
+// ngay trên phần import hoặc trong file quizData.ts
 export interface IQuizAnswer {
-  _id: string;
-  text: string;
-  points: number;
-}
-
-export interface IQuizQuestion {
-  _id: string;
-  question: string;
-  answers: IQuizAnswer[];
-}
-
-export interface IQuiz {
-  _id: string;
-  title: string;
-  description: string;
-  questions: IQuizQuestion[];
-}
-
-export interface QuizData {
-  title: string;
-  description: string;
-  questions: Array<{
+    text: string;
+    points: number;
+  }
+  
+  export interface IIQuizQuestion {
     question: string;
-    answers: Array<{
-      text: string;
-      points: number;
-    }>;
-  }>;
-}
-
-export interface QuizSubmission {
-  quizId: string;
-  answers: {
-    questionId: string;
-    answerId: string;
-  }[];
-}
+    answers: IQuizAnswer[];
+  }
+  
